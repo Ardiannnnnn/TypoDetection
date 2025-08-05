@@ -70,15 +70,15 @@ export default function Home() {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">99.7%</div>
+                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">0%</div>
                 <div className="text-gray-600 font-poppins">Accuracy Rate</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">10M+</div>
+                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">0</div>
                 <div className="text-gray-600 font-poppins">Documents Processed</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">50K+</div>
+                <div className="text-4xl font-bold text-indigo-600 mb-2 font-poppins">0</div>
                 <div className="text-gray-600 font-poppins">Happy Users</div>
               </div>
             </div>
