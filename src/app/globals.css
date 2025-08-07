@@ -19,6 +19,12 @@ body {
   font-family: var(--font-poppins);
 }
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Account for fixed navbar */
+}
+
 /* Poppins utility classes */
 .font-poppins {
   font-family: var(--font-poppins);
@@ -27,4 +33,59 @@ body {
 /* Override Tailwind's default font-sans */
 .font-sans {
   font-family: var(--font-poppins);
+}
+
+/* Backdrop blur support for older browsers */
+@supports not (backdrop-filter: blur(12px)) {
+  .backdrop-blur-md {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Remove ALL focus outlines */
+*:focus {
+  outline: none !important;
+}
+
+button:focus {
+  outline: none !important;
+}
+
+a:focus {
+  outline: none !important;
+}
+
+input:focus {
+  outline: none !important;
+}
+
+textarea:focus {
+  outline: none !important;
+}
+
+select:focus {
+  outline: none !important;
+}
+
+/* Remove focus ring for all elements */
+*:focus-visible {
+  outline: none !important;
 }
