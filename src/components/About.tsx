@@ -1,11 +1,30 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 
 export default function About() {
+  const t = useTranslations('about');
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
+  // Function to render text with highlight
+  // ✅ Update function di semua components
+// ✅ Function yang sama untuk semua components
+const renderTextWithHighlight = (text: string) => {
+  return text
+    .split('##HIGHLIGHT_START##')
+    .map((part, index) => {
+      if (index === 0) return part;
+      const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
+      return (
+        <span key={index}>
+          <span className="text-indigo-600">{highlighted}</span>
+          {rest.join('##HIGHLIGHT_END##')}
+        </span>
+      );
+    });
+};
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -33,12 +52,10 @@ export default function About() {
           className="text-center mb-8 sm:mb-12 lg:mb-16 opacity-0 translate-y-8 transition-all duration-1000 ease-out"
         >
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 font-poppins">
-            About <span className="text-indigo-600">TypoDetector</span>
+            {renderTextWithHighlight(t('title'))}
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-poppins px-4">
-            TypoDetector adalah aplikasi AI canggih yang dirancang untuk membantu Anda 
-            mendeteksi dan memperbaiki kesalahan pengetikan dalam dokumen PDF dengan 
-            akurasi tinggi dan kecepatan yang luar biasa.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -49,7 +66,7 @@ export default function About() {
           {/* Left Content - Features */}
           <div className="order-2 lg:order-1">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 font-poppins">
-              Mengapa Memilih TypoDetector?
+              {t('whyChoose')}
             </h3>
             <div className="space-y-4 sm:space-y-6">
               <div className="flex items-start space-x-3 sm:space-x-4">
@@ -60,11 +77,10 @@ export default function About() {
                 </div>
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 font-poppins">
-                    Teknologi AI Terdepan
+                    {t('features.aiTechnology.title')}
                   </h4>
                   <p className="text-sm sm:text-base text-gray-600 font-poppins">
-                    Menggunakan machine learning algorithms terbaru untuk mendeteksi typo 
-                    dengan akurasi hingga 99.8%.
+                    {t('features.aiTechnology.description')}
                   </p>
                 </div>
               </div>
@@ -77,11 +93,10 @@ export default function About() {
                 </div>
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 font-poppins">
-                    Keamanan Terjamin
+                    {t('features.security.title')}
                   </h4>
                   <p className="text-sm sm:text-base text-gray-600 font-poppins">
-                    Dokumen Anda diproses secara lokal dan tidak disimpan di server kami, 
-                    menjamin privasi dan keamanan data.
+                    {t('features.security.description')}
                   </p>
                 </div>
               </div>
@@ -94,11 +109,10 @@ export default function About() {
                 </div>
                 <div>
                   <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 font-poppins">
-                    Mudah Digunakan
+                    {t('features.easyToUse.title')}
                   </h4>
                   <p className="text-sm sm:text-base text-gray-600 font-poppins">
-                    Interface yang intuitif memungkinkan Anda mendeteksi typo hanya 
-                    dalam beberapa klik.
+                    {t('features.easyToUse.description')}
                   </p>
                 </div>
               </div>
@@ -108,12 +122,10 @@ export default function About() {
           {/* Right Content - Mission & Team */}
           <div className="order-1 lg:order-2 bg-gradient-to-br from-indigo-50 to-purple-50 p-6 sm:p-8 rounded-2xl">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 font-poppins">
-              Misi Kami
+              {t('mission.title')}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 leading-relaxed font-poppins">
-              Kami berkomitmen untuk membantu meningkatkan kualitas tulisan dan 
-              komunikasi dengan menyediakan teknologi deteksi typo yang akurat, 
-              cepat, dan mudah digunakan untuk semua orang.
+              {t('mission.description')}
             </p>
             
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
@@ -123,16 +135,15 @@ export default function About() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-800 font-poppins text-sm sm:text-base">
-                    TypoDetector Team
+                    {t('mission.team')}
                   </h4>
                   <p className="text-gray-600 text-xs sm:text-sm font-poppins">
-                    AI Research & Development
+                    {t('mission.role')}
                   </p>
                 </div>
               </div>
               <p className="text-gray-600 text-xs sm:text-sm italic font-poppins">
-                "Membuat teknologi AI yang dapat membantu semua orang menulis 
-                dengan lebih baik dan percaya diri."
+                "{t('mission.quote')}"
               </p>
             </div>
           </div>
