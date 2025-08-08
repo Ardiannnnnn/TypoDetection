@@ -1,0 +1,204 @@
+{
+  "bahasa": "id",
+  "navigation": {
+    "home": "Beranda",
+    "about": "Tentang",
+    "howItWorks": "Cara Kerja",
+    "contact": "Kontak",
+    "getStarted": "Mulai",
+    "backToHome": "Kembali ke Beranda"
+  },
+  "hero": {
+    "title": "Deteksi ##HIGHLIGHT_START##Typo##HIGHLIGHT_END## dengan##BR##Presisi AI",
+    "subtitle": "Unggah dokumen Anda dan biarkan sistem AI canggih kami mengidentifikasi dan menyorot kesalahan ejaan, tata bahasa, dan typo dengan akurasi yang luar biasa.",
+    "uploadDocument": "Unggah Dokumen",
+    "learnMore": "Pelajari Lebih Lanjut"
+  },
+  "features": {
+    "aiPowered": {
+      "title": "Deteksi Bertenaga AI",
+      "description": "Algoritma machine learning canggih mendeteksi bahkan typo dan kesalahan tata bahasa yang paling halus."
+    },
+    "lightningFast": {
+      "title": "Sangat Cepat",
+      "description": "Proses dokumen Anda dalam hitungan detik dengan mesin deteksi yang dioptimalkan."
+    },
+    "secure": {
+      "title": "Aman & Privat",
+      "description": "Dokumen Anda diproses dengan aman dan tidak pernah disimpan di server kami."
+    }
+  },
+  "stats": {
+    "title": "Dampak Kami",
+    "accuracy": "Tingkat Akurasi",
+    "documents": "Dokumen Diproses",
+    "users": "Pengguna Puas"
+  },
+  "about": {
+    "title": "Tentang ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
+    "subtitle": "TypoDetector adalah aplikasi AI canggih yang dirancang untuk membantu Anda mendeteksi dan memperbaiki kesalahan pengetikan dalam dokumen PDF dengan akurasi tinggi dan kecepatan yang luar biasa.",
+    "whyChoose": "Mengapa Memilih TypoDetector?",
+    "features": {
+      "aiTechnology": {
+        "title": "Teknologi AI Terdepan",
+        "description": "Menggunakan algoritma machine learning terbaru untuk mendeteksi typo dengan akurasi hingga 99.8%."
+      },
+      "security": {
+        "title": "Keamanan Terjamin",
+        "description": "Dokumen Anda diproses secara lokal dan tidak disimpan di server kami, menjamin privasi dan keamanan data."
+      },
+      "easyToUse": {
+        "title": "Mudah Digunakan",
+        "description": "Interface yang intuitif memungkinkan Anda mendeteksi typo hanya dalam beberapa klik."
+      }
+    },
+    "mission": {
+      "title": "Misi Kami",
+      "description": "Kami berkomitmen untuk membantu meningkatkan kualitas tulisan dan komunikasi dengan menyediakan teknologi deteksi typo yang akurat, cepat, dan mudah digunakan untuk semua orang.",
+      "team": "Tim TypoDetector",
+      "role": "Penelitian & Pengembangan AI",
+      "quote": "Membuat teknologi AI yang dapat membantu semua orang menulis dengan lebih baik dan percaya diri."
+    }
+  },
+  "howItWorks": {
+    "title": "Cara Kerja ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
+    "subtitle": "Proses deteksi typo yang mudah dan cepat dalam 4 langkah sederhana",
+    "steps": {
+      "upload": {
+        "title": "Upload PDF",
+        "description": "Pilih dan upload dokumen PDF yang ingin Anda periksa. Sistem kami mendukung berbagai format PDF."
+      },
+      "aiAnalysis": {
+        "title": "AI Analysis",
+        "description": "AI kami akan menganalisis setiap kata dalam dokumen menggunakan algoritma machine learning canggih."
+      },
+      "typoDetection": {
+        "title": "Typo Detection",
+        "description": "Sistem akan mengidentifikasi dan menandai semua kesalahan pengetikan, tata bahasa, dan ejaan."
+      },
+      "getResults": {
+        "title": "Get Results",
+        "description": "Dapatkan PDF yang sudah dikoreksi dengan typo yang di-highlight dan saran perbaikan yang detail."
+      }
+    },
+    "cta": {
+      "title": "Siap untuk Mencoba?",
+      "description": "Upload dokumen PDF Anda sekarang dan rasakan pengalaman deteksi typo dengan teknologi AI terdepan.",
+      "button": "Mulai Upload PDF"
+    }
+  },
+  "contact": {
+    "title": "Hubungi ##HIGHLIGHT_START##Kami##HIGHLIGHT_END##",
+    "subtitle": "Berikan feedback, laporkan masalah, atau ajukan pertanyaan. Kami senang mendengar dari Anda!",
+    "letsTalk": "Mari Berdiskusi",
+    "info": {
+      "email": {
+        "title": "Email",
+        "support": "support@typodetector.com",
+        "feedback": "feedback@typodetector.com"
+      },
+      "responseTime": {
+        "title": "Response Time",
+        "time": "Respon dalam 24 jam",
+        "availability": "7 hari seminggu"
+      },
+      "location": {
+        "title": "Location",
+        "country": "Indonesia",
+        "timezone": "WIB Timezone"
+      }
+    },
+    "faq": {
+      "title": "FAQ Cepat",
+      "questions": {
+        "dataSecurity": {
+          "question": "Apakah data saya aman?",
+          "answer": "Ya, dokumen diproses lokal dan tidak disimpan."
+        },
+        "fileFormats": {
+          "question": "Format file apa yang didukung?",
+          "answer": "Saat ini mendukung format PDF dengan ukuran maksimal 50MB."
+        }
+      }
+    },
+    "form": {
+      "name": "Nama Lengkap",
+      "email": "Email",
+      "subject": "Subjek",
+      "rating": "Rating Pengalaman (1-5)",
+      "message": "Pesan",
+      "placeholders": {
+        "name": "Masukkan nama Anda",
+        "email": "nama@email.com",
+        "subject": "Pilih subjek",
+        "message": "Tulis pesan, feedback, atau pertanyaan Anda di sini..."
+      },
+      "subjects": {
+        "general": "Feedback Umum",
+        "bug": "Laporan Bug",
+        "feature": "Permintaan Fitur",
+        "technical": "Masalah Teknis",
+        "usage": "Pertanyaan Penggunaan",
+        "other": "Lainnya"
+      },
+      "buttons": {
+        "submit": "Kirim Pesan",
+        "submitting": "Mengirim...",
+        "sendAnother": "Kirim Pesan Lain"
+      },
+      "success": {
+        "title": "Terima Kasih!",
+        "message": "Pesan Anda telah berhasil dikirim. Tim kami akan merespon dalam 24 jam."
+      }
+    }
+  },
+  "upload": {
+    "title": "Deteksi Typo PDF Bertenaga AI",
+    "subtitle": "Unggah dokumen PDF Anda dan biarkan AI canggih kami menganalisisnya untuk mencari kesalahan ejaan, tata bahasa, dan typo dengan akurasi yang luar biasa.",
+    "uploadSection": {
+      "title": "Unggah Dokumen PDF",
+      "dragDrop": "Seret & lepas file PDF Anda di sini",
+      "or": "atau klik untuk mencari file",
+      "support": "Mendukung: File PDF hingga 50MB",
+      "ready": "PDF Siap untuk Dianalisis",
+      "size": "Ukuran"
+    },
+    "buttons": {
+      "removeFile": "Hapus File",
+      "analyzeDesktop": "Mulai Analisis Typo",
+      "analyzeMobile": "Analisis PDF",
+      "analyzing": "Menganalisis PDF... Harap tunggu",
+      "analyzingMobile": "Menganalisis...",
+      "downloadPdf": "Unduh PDF",
+      "newAnalysisDesktop": "Analisis PDF Lain",
+      "newAnalysisMobile": "Analisis Baru"
+    },
+    "results": {
+      "title": "Analisis Selesai! 🎉",
+      "stats": {
+        "pages": "Halaman",
+        "words": "Kata",
+        "typos": "Typo",
+        "accuracy": "Akurasi",
+        "time": "Waktu"
+      },
+      "correctedPdf": {
+        "title": "PDF yang Diperbaiki",
+        "subtitle": "(Typo Disorot)",
+        "generating": "Membuat PDF yang diperbaiki..."
+      },
+      "typosList": {
+        "title": "Typo yang Terdeteksi",
+        "errors": "kesalahan"
+      }
+    },
+    "alerts": {
+      "pdfOnly": "Silakan unggah file PDF (.pdf)",
+      "pdfGenerating": "PDF dengan typo yang disorot sedang dibuat..."
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 TypoDetector. Hak cipta dilindungi.",
+    "powered": "Didukung oleh Teknologi AI Canggih untuk Deteksi Typo yang Akurat"
+  }
+}

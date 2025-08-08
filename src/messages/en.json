@@ -1,0 +1,204 @@
+{
+  "bahasa": "en",
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "howItWorks": "How It Works",
+    "contact": "Contact",
+    "getStarted": "Get Started",
+    "backToHome": "Back to Home"
+  },
+  "hero": {
+    "title": "Detect ##HIGHLIGHT_START##Typos##HIGHLIGHT_END## with##BR##AI Precision",
+    "subtitle": "Upload your documents and let our advanced AI system identify and highlight spelling mistakes, grammar errors, and typos with incredible accuracy.",
+    "uploadDocument": "Upload Document",
+    "learnMore": "Learn More"
+  },
+  "features": {
+    "aiPowered": {
+      "title": "AI-Powered Detection",
+      "description": "Advanced machine learning algorithms detect even the most subtle typos and grammatical errors."
+    },
+    "lightningFast": {
+      "title": "Lightning Fast",
+      "description": "Process your documents in seconds with our optimized detection engine."
+    },
+    "secure": {
+      "title": "Secure & Private",
+      "description": "Your documents are processed securely and never stored on our servers."
+    }
+  },
+  "stats": {
+    "title": "Our Impact",
+    "accuracy": "Accuracy Rate",
+    "documents": "Documents Processed",
+    "users": "Happy Users"
+  },
+  "about": {
+    "title": "About ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
+    "subtitle": "TypoDetector is an advanced AI application designed to help you detect and correct typos in PDF documents with high accuracy and exceptional speed.",
+    "whyChoose": "Why Choose TypoDetector?",
+    "features": {
+      "aiTechnology": {
+        "title": "Advanced AI Technology",
+        "description": "Using the latest machine learning algorithms to detect typos with up to 99.8% accuracy."
+      },
+      "security": {
+        "title": "Guaranteed Security",
+        "description": "Your documents are processed locally and not stored on our servers, ensuring data privacy and security."
+      },
+      "easyToUse": {
+        "title": "Easy to Use",
+        "description": "Intuitive interface allows you to detect typos in just a few clicks."
+      }
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "We are committed to helping improve writing quality and communication by providing accurate, fast, and easy-to-use typo detection technology for everyone.",
+      "team": "TypoDetector Team",
+      "role": "AI Research & Development",
+      "quote": "Creating AI technology that can help everyone write better and more confidently."
+    }
+  },
+  "howItWorks": {
+    "title": "How ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END## Works",
+    "subtitle": "Easy and fast typo detection process in 4 simple steps",
+    "steps": {
+      "upload": {
+        "title": "Upload PDF",
+        "description": "Choose and upload the PDF document you want to check. Our system supports various PDF formats."
+      },
+      "aiAnalysis": {
+        "title": "AI Analysis",
+        "description": "Our AI will analyze every word in the document using advanced machine learning algorithms."
+      },
+      "typoDetection": {
+        "title": "Typo Detection",
+        "description": "The system will identify and mark all spelling errors, grammar mistakes, and typos."
+      },
+      "getResults": {
+        "title": "Get Results",
+        "description": "Get a corrected PDF with highlighted typos and detailed correction suggestions."
+      }
+    },
+    "cta": {
+      "title": "Ready to Try?",
+      "description": "Upload your PDF document now and experience typo detection with cutting-edge AI technology.",
+      "button": "Start Upload PDF"
+    }
+  },
+  "contact": {
+    "title": "Contact ##HIGHLIGHT_START##Us##HIGHLIGHT_END##",
+    "subtitle": "Give feedback, report issues, or ask questions. We'd love to hear from you!",
+    "letsTalk": "Let's Discuss",
+    "info": {
+      "email": {
+        "title": "Email",
+        "support": "support@typodetector.com",
+        "feedback": "feedback@typodetector.com"
+      },
+      "responseTime": {
+        "title": "Response Time",
+        "time": "Response within 24 hours",
+        "availability": "7 days a week"
+      },
+      "location": {
+        "title": "Location",
+        "country": "Indonesia",
+        "timezone": "WIB Timezone"
+      }
+    },
+    "faq": {
+      "title": "Quick FAQ",
+      "questions": {
+        "dataSecurity": {
+          "question": "Is my data safe?",
+          "answer": "Yes, documents are processed locally and not stored."
+        },
+        "fileFormats": {
+          "question": "What file formats are supported?",
+          "answer": "Currently supports PDF format with maximum size of 50MB."
+        }
+      }
+    },
+    "form": {
+      "name": "Full Name",
+      "email": "Email",
+      "subject": "Subject",
+      "rating": "Experience Rating (1-5)",
+      "message": "Message",
+      "placeholders": {
+        "name": "Enter your name",
+        "email": "name@email.com",
+        "subject": "Choose subject",
+        "message": "Write your message, feedback, or questions here..."
+      },
+      "subjects": {
+        "general": "General Feedback",
+        "bug": "Bug Report",
+        "feature": "Feature Request",
+        "technical": "Technical Issue",
+        "usage": "Usage Question",
+        "other": "Other"
+      },
+      "buttons": {
+        "submit": "Send Message",
+        "submitting": "Sending...",
+        "sendAnother": "Send Another Message"
+      },
+      "success": {
+        "title": "Thank You!",
+        "message": "Your message has been sent successfully. Our team will respond within 24 hours."
+      }
+    }
+  },
+  "upload": {
+    "title": "AI-Powered PDF Typo Detection",
+    "subtitle": "Upload your PDF document and let our advanced AI analyze it for spelling errors, grammar mistakes, and typos with incredible accuracy.",
+    "uploadSection": {
+      "title": "Upload PDF Document",
+      "dragDrop": "Drag & drop your PDF file here",
+      "or": "or click to browse files",
+      "support": "Supports: PDF files up to 50MB",
+      "ready": "PDF Ready for Analysis",
+      "size": "Size"
+    },
+    "buttons": {
+      "removeFile": "Remove File",
+      "analyzeDesktop": "Start Typo Analysis",
+      "analyzeMobile": "Analyze PDF",
+      "analyzing": "Analyzing PDF... Please wait",
+      "analyzingMobile": "Analyzing...",
+      "downloadPdf": "Download PDF",
+      "newAnalysisDesktop": "Analyze Another PDF",
+      "newAnalysisMobile": "New Analysis"
+    },
+    "results": {
+      "title": "Analysis Complete! 🎉",
+      "stats": {
+        "pages": "Pages",
+        "words": "Words",
+        "typos": "Typos",
+        "accuracy": "Accuracy",
+        "time": "Time"
+      },
+      "correctedPdf": {
+        "title": "Corrected PDF",
+        "subtitle": "(Typos Highlighted)",
+        "generating": "Generating corrected PDF..."
+      },
+      "typosList": {
+        "title": "Detected Typos",
+        "errors": "errors"
+      }
+    },
+    "alerts": {
+      "pdfOnly": "Please upload a PDF file (.pdf)",
+      "pdfGenerating": "PDF with highlighted typos is being generated..."
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 TypoDetector. All rights reserved.",
+    "powered": "Powered by Advanced AI Technology for Accurate Typo Detection"
+  }
+}

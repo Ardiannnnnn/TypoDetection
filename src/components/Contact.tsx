@@ -1,8 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Contact() {
+  const t = useTranslations('contact');
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
@@ -14,6 +16,23 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  // Function to render text with highlight
+  // ✅ Function yang sama untuk semua components
+const renderTextWithHighlight = (text: string) => {
+  return text
+    .split('##HIGHLIGHT_START##')
+    .map((part, index) => {
+      if (index === 0) return part;
+      const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
+      return (
+        <span key={index}>
+          <span className="text-indigo-600">{highlighted}</span>
+          {rest.join('##HIGHLIGHT_END##')}
+        </span>
+      );
+    });
+};
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -59,13 +78,14 @@ export default function Contact() {
     }, 2000);
   };
 
+  // ✅ Get subjects from translations
   const subjects = [
-    'Feedback Umum',
-    'Laporan Bug',
-    'Permintaan Fitur',
-    'Masalah Teknis',
-    'Pertanyaan Penggunaan',
-    'Lainnya'
+    t('form.subjects.general'),
+    t('form.subjects.bug'),
+    t('form.subjects.feature'),
+    t('form.subjects.technical'),
+    t('form.subjects.usage'),
+    t('form.subjects.other')
   ];
 
   if (submitted) {
@@ -80,16 +100,16 @@ export default function Contact() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-gray-800 mb-4 font-poppins">
-                Terima Kasih!
+                {t('form.success.title')}
               </h3>
               <p className="text-gray-600 mb-6 font-poppins">
-                Pesan Anda telah berhasil dikirim. Tim kami akan merespon dalam 24 jam.
+                {t('form.success.message')}
               </p>
               <button
                 onClick={() => setSubmitted(false)}
                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-poppins"
               >
-                Kirim Pesan Lain
+                {t('form.buttons.sendAnother')}
               </button>
             </div>
           </div>
@@ -106,11 +126,10 @@ export default function Contact() {
           className="text-center mb-16 opacity-0 translate-y-8 transition-all duration-1000 ease-out"
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-6 font-poppins">
-            Hubungi <span className="text-indigo-600">Kami</span>
+            {renderTextWithHighlight(t('title'))}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-poppins">
-            Berikan feedback, laporkan masalah, atau ajukan pertanyaan. 
-            Kami senang mendengar dari Anda!
+            {t('subtitle')}
           </p>
         </div>
 
@@ -121,7 +140,7 @@ export default function Contact() {
             className="opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300"
           >
             <h3 className="text-2xl font-bold text-gray-800 mb-8 font-poppins">
-              Mari Berdiskusi
+              {t('letsTalk')}
             </h3>
             
             <div className="space-y-6">
@@ -132,9 +151,11 @@ export default function Contact() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">Email</h4>
-                  <p className="text-gray-600 font-poppins">support@typodetector.com</p>
-                  <p className="text-gray-600 font-poppins">feedback@typodetector.com</p>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                    {t('info.email.title')}
+                  </h4>
+                  <p className="text-gray-600 font-poppins">{t('info.email.support')}</p>
+                  <p className="text-gray-600 font-poppins">{t('info.email.feedback')}</p>
                 </div>
               </div>
 
@@ -145,9 +166,11 @@ export default function Contact() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">Response Time</h4>
-                  <p className="text-gray-600 font-poppins">Respon dalam 24 jam</p>
-                  <p className="text-gray-600 font-poppins">7 hari seminggu</p>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                    {t('info.responseTime.title')}
+                  </h4>
+                  <p className="text-gray-600 font-poppins">{t('info.responseTime.time')}</p>
+                  <p className="text-gray-600 font-poppins">{t('info.responseTime.availability')}</p>
                 </div>
               </div>
 
@@ -159,9 +182,11 @@ export default function Contact() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">Location</h4>
-                  <p className="text-gray-600 font-poppins">Indonesia</p>
-                  <p className="text-gray-600 font-poppins">WIB Timezone</p>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                    {t('info.location.title')}
+                  </h4>
+                  <p className="text-gray-600 font-poppins">{t('info.location.country')}</p>
+                  <p className="text-gray-600 font-poppins">{t('info.location.timezone')}</p>
                 </div>
               </div>
             </div>
@@ -169,20 +194,20 @@ export default function Contact() {
             {/* FAQ Section */}
             <div className="mt-12 p-6 bg-gray-50 rounded-xl">
               <h4 className="text-lg font-semibold text-gray-800 mb-4 font-poppins">
-                FAQ Cepat
+                {t('faq.title')}
               </h4>
               <div className="space-y-3 text-sm">
                 <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">Q:</span> Apakah data saya aman?
+                  <span className="font-medium">Q:</span> {t('faq.questions.dataSecurity.question')}
                 </p>
                 <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">A:</span> Ya, dokumen diproses lokal dan tidak disimpan.
+                  <span className="font-medium">A:</span> {t('faq.questions.dataSecurity.answer')}
                 </p>
                 <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">Q:</span> Format file apa yang didukung?
+                  <span className="font-medium">Q:</span> {t('faq.questions.fileFormats.question')}
                 </p>
                 <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">A:</span> Saat ini mendukung format PDF dengan ukuran maksimal 50MB.
+                  <span className="font-medium">A:</span> {t('faq.questions.fileFormats.answer')}
                 </p>
               </div>
             </div>
@@ -194,7 +219,7 @@ export default function Contact() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
-                    Nama Lengkap *
+                    {t('form.name')} *
                   </label>
                   <input
                     type="text"
@@ -202,14 +227,14 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins"
-                    placeholder="Masukkan nama Anda"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800"
+                    placeholder={t('form.placeholders.name')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
-                    Email *
+                    {t('form.email')} *
                   </label>
                   <input
                     type="email"
@@ -217,24 +242,24 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins"
-                    placeholder="nama@email.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800"
+                    placeholder={t('form.placeholders.email')}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
-                  Subjek *
+                  {t('form.subject')} *
                 </label>
                 <select
                   name="subject"
                   value={formData.subject}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800 placeholder:text-gray-400"
                 >
-                  <option value="">Pilih subjek</option>
+                  <option value="">{t('form.placeholders.subject')}</option>
                   {subjects.map((subject) => (
                     <option key={subject} value={subject}>{subject}</option>
                   ))}
@@ -243,7 +268,7 @@ export default function Contact() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
-                  Rating Pengalaman (1-5)
+                  {t('form.rating')}
                 </label>
                 <div className="flex space-x-2">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -263,7 +288,7 @@ export default function Contact() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
-                  Pesan *
+                  {t('form.message')} *
                 </label>
                 <textarea
                   name="message"
@@ -271,8 +296,8 @@ export default function Contact() {
                   onChange={handleInputChange}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none font-poppins"
-                  placeholder="Tulis pesan, feedback, atau pertanyaan Anda di sini..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none font-poppins text-gray-800"
+                  placeholder={t('form.placeholders.message')}
                 />
               </div>
 
@@ -288,10 +313,10 @@ export default function Contact() {
                 {isSubmitting ? (
                   <div className="flex items-center justify-center space-x-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Mengirim...</span>
+                    <span>{t('form.buttons.submitting')}</span>
                   </div>
                 ) : (
-                  'Kirim Pesan'
+                  t('form.buttons.submit')
                 )}
               </button>
             </form>

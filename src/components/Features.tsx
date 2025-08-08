@@ -1,10 +1,29 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 
 export default function HowItWorks() {
+  const t = useTranslations('howItWorks');
   const titleRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
+
+  // Function to render text with highlight
+ // ✅ Function yang sama untuk semua components
+const renderTextWithHighlight = (text: string) => {
+  return text
+    .split('##HIGHLIGHT_START##')
+    .map((part, index) => {
+      if (index === 0) return part;
+      const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
+      return (
+        <span key={index}>
+          <span className="text-indigo-600">{highlighted}</span>
+          {rest.join('##HIGHLIGHT_END##')}
+        </span>
+      );
+    });
+};
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,8 +47,8 @@ export default function HowItWorks() {
   const steps = [
     {
       number: "01",
-      title: "Upload PDF",
-      description: "Pilih dan upload dokumen PDF yang ingin Anda periksa. Sistem kami mendukung berbagai format PDF.",
+      title: t('steps.upload.title'),
+      description: t('steps.upload.description'),
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -39,8 +58,8 @@ export default function HowItWorks() {
     },
     {
       number: "02", 
-      title: "AI Analysis",
-      description: "AI kami akan menganalisis setiap kata dalam dokumen menggunakan algoritma machine learning canggih.",
+      title: t('steps.aiAnalysis.title'),
+      description: t('steps.aiAnalysis.description'),
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -50,8 +69,8 @@ export default function HowItWorks() {
     },
     {
       number: "03",
-      title: "Typo Detection",
-      description: "Sistem akan mengidentifikasi dan menandai semua kesalahan pengetikan, tata bahasa, dan ejaan.",
+      title: t('steps.typoDetection.title'),
+      description: t('steps.typoDetection.description'),
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -61,14 +80,14 @@ export default function HowItWorks() {
     },
     {
       number: "04",
-      title: "Get Results",
-      description: "Dapatkan PDF yang sudah dikoreksi dengan typo yang di-highlight dan saran perbaikan yang detail.",
+      title: t('steps.getResults.title'),
+      description: t('steps.getResults.description'),
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      color: "orange"
+      color: "red"
     }
   ];
 
@@ -80,10 +99,10 @@ export default function HowItWorks() {
           className="text-center mb-16 opacity-0 translate-y-8 transition-all duration-1000 ease-out"
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-6 font-poppins">
-            Cara Kerja <span className="text-indigo-600">TypoDetector</span>
+            {renderTextWithHighlight(t('title'))}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-poppins">
-            Proses deteksi typo yang mudah dan cepat dalam 4 langkah sederhana
+            {t('subtitle')}
           </p>
         </div>
 
@@ -132,26 +151,26 @@ export default function HowItWorks() {
           <div className="text-center mt-16">
             <div className="bg-white p-8 rounded-2xl shadow-lg max-w-2xl mx-auto">
               <h3 className="text-2xl font-bold text-gray-800 mb-4 font-poppins">
-                Siap untuk Mencoba?
+                {t('cta.title')}
               </h3>
               <p className="text-gray-600 mb-6 font-poppins">
-                Upload dokumen PDF Anda sekarang dan rasakan pengalaman deteksi typo dengan teknologi AI terdepan.
+                {t('cta.description')}
               </p>
               
               <button 
-                  onClick={() => {
-                    const aboutSection = document.getElementById('home');
-                    if (aboutSection) {
-                      aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl font-poppins"
-                >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                onClick={() => {
+                  const aboutSection = document.getElementById('hero');
+                  if (aboutSection) {
+                    aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl font-poppins"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                  Mulai Upload PDF
-                </button>
+                {t('cta.button')}
+              </button>
             </div>
           </div>
         </div>

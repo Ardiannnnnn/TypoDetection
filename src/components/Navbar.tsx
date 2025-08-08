@@ -3,52 +3,65 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher'; // ✅ Fix import path
 
 interface NavbarProps {
   showBackButton?: boolean;
 }
 
 export default function Navbar({ showBackButton = false }: NavbarProps) {
-  const [activeSection, setActiveSection] = useState('');
+  const t = useTranslations('navigation');
+  const locale = useLocale();
+  const [activeSection, setActiveSection] = useState('hero'); // ✅ Default ke hero
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
-      // Change navbar appearance when scrolled
       setIsScrolled(window.scrollY > 50);
 
-      // Track active section for highlighting (only on home page)
-      if (pathname === '/') {
+      // ✅ Hanya detect scroll di homepage
+      if (pathname === `/${locale}` || pathname === '/') {
+        // ✅ Update section IDs sesuai dengan yang ada di DOM
         const sections = ['hero', 'about', 'how-it-works', 'contact'];
-        const currentSection = sections.find(section => {
-          const element = document.getElementById(section);
+        let currentSection = 'hero'; // Default
+
+        // ✅ Improved scroll detection logic
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const element = document.getElementById(sections[i]);
           if (element) {
             const rect = element.getBoundingClientRect();
-            return rect.top <= 100 && rect.bottom >= 100;
+            // ✅ Check if section is in viewport (dengan offset untuk navbar)
+            if (rect.top <= 120) {
+              currentSection = sections[i];
+              break;
+            }
           }
-          return false;
-        });
+        }
         
-        setActiveSection(currentSection || 'hero');
+        setActiveSection(currentSection);
       }
     };
 
+    // ✅ Initial call untuk set active section
+    handleScroll();
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathname]);
+  }, [pathname, locale]);
 
   const smoothScrollTo = (elementId: string) => {
     const element = document.getElementById(elementId);
     if (element) {
-      const offsetTop = element.offsetTop - 80; // Account for fixed navbar height
+      const offsetTop = element.offsetTop - 100; // ✅ Adjust offset
       window.scrollTo({
         top: offsetTop,
         behavior: 'smooth'
       });
     }
-    setIsMobileMenuOpen(false); // Close mobile menu after clicking
+    setIsMobileMenuOpen(false);
   };
 
   const scrollToTop = () => {
@@ -56,21 +69,21 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
       top: 0,
       behavior: 'smooth'
     });
+    setActiveSection('hero'); // ✅ Set active ke hero saat scroll to top
   };
 
   const handleLogoClick = (e: React.MouseEvent) => {
-    // If we're on home page, scroll to top instead of navigating
-    if (pathname === '/') {
+    if (pathname === `/${locale}` || pathname === '/') {
       e.preventDefault();
       scrollToTop();
     }
-    // If we're on other pages, let the Link component handle navigation normally
   };
 
+  // ✅ Update nav links dengan ID yang benar
   const navLinks = [
-    { id: 'about', label: 'About', href: '#about' },
-    { id: 'how-it-works', label: 'How It Works', href: '#how-it-works' },
-    { id: 'contact', label: 'Contact', href: '#contact' },
+    { id: 'about', label: t('about'), href: '#about' },
+    { id: 'how-it-works', label: t('howItWorks'), href: '#how-it-works' }, // ✅ Pastikan ID ini match dengan section
+    { id: 'contact', label: t('contact'), href: '#contact' },
   ];
 
   return (
@@ -83,7 +96,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link 
-            href="/" 
+            href={`/${locale}`}
             onClick={handleLogoClick}
             className="flex items-center space-x-2 z-10 group cursor-pointer focus:outline-none"
           >
@@ -105,9 +118,9 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                   activeSection === 'hero' ? 'text-indigo-600' : ''
                 }`}
               >
-                Home
-                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full ${
-                  activeSection === 'hero' ? 'w-full' : ''
+                {t('home')}
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-indigo-600 transition-all duration-300 ${
+                  activeSection === 'hero' ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}></span>
               </button>
 
@@ -120,62 +133,69 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                   }`}
                 >
                   {link.label}
-                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all duration-300 group-hover:w-full ${
-                    activeSection === link.id ? 'w-full' : ''
+                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-indigo-600 transition-all duration-300 ${
+                    activeSection === link.id ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}></span>
                 </button>
               ))}
               
               <Link 
-                href="/upload"
+                href={`/${locale}/upload`}
                 className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg font-poppins focus:outline-none"
               >
-                Get Started
+                {t('getStarted')}
               </Link>
+
+              {/* Language Switcher */}
+              <LanguageSwitcher />
             </div>
           )}
 
           {/* Mobile Menu Button */}
           {!showBackButton && (
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-600 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
+            <div className="lg:hidden flex items-center space-x-4">
+              <LanguageSwitcher />
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-600 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
           )}
 
           {/* Back Button for Upload Page - Responsive */}
           {showBackButton && (
-            <>
+            <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
               {/* Desktop - Text with Icon */}
               <Link 
-                href="/"
+                href={`/${locale}`}
                 className="hidden lg:flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 font-poppins group focus:outline-none"
               >
                 <svg className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                <span>Back to Home</span>
+                <span>{t('backToHome')}</span>
               </Link>
               
               {/* Mobile - Icon Only */}
               <Link 
-                href="/"
+                href={`/${locale}`}
                 className="lg:hidden flex items-center justify-center w-10 h-10 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-all duration-200 font-poppins group focus:outline-none"
-                title="Back to Home"
+                title={t('backToHome')}
               >
                 <svg className="w-5 h-5 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </Link>
-            </>
+            </div>
           )}
         </div>
 
@@ -192,7 +212,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                   activeSection === 'hero' ? 'text-indigo-600' : ''
                 }`}
               >
-                Home
+                {t('home')}
                 {activeSection === 'hero' && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></span>
                 )}
@@ -216,11 +236,11 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
               
               <div className="pt-4 border-t border-gray-200">
                 <Link 
-                  href="/upload"
+                  href={`/${locale}/upload`}
                   className="block w-full text-center bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-poppins focus:outline-none"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Get Started
+                  {t('getStarted')}
                 </Link>
               </div>
             </div>
