@@ -10,7 +10,12 @@ const locales = ['en', 'id'];
 
 export const metadata: Metadata = {
   title: 'TypoDetector',
-  description: 'AI-powered typo detection for PDF documents',
+  description: 'Automatically detect typos in your thesis or final project report with AI technology. Fast, accurate, and supports PDF files.',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export function generateStaticParams() {
