@@ -80,8 +80,6 @@ export default function LanguageSwitcher() {
     setIsOpen(false);
   }, [pathname]);
 
-  console.log('🌐 Current locale in switcher:', locale);
-  console.log('📍 Current pathname in switcher:', pathname);
 
   return (
     <div className="relative" ref={dropdownRef}>

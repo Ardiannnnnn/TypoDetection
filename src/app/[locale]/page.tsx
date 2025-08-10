@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -68,7 +68,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-poppins">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 dark:bg-black to-indigo-100 font-poppins">
       <Navbar />
       
       <div id="hero" className="pt-20">

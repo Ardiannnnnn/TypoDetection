@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import LanguageSwitcher from './LanguageSwitcher'; // ✅ Fix import path
+import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle'; // ✅ Import ThemeToggle
 
 interface NavbarProps {
   showBackButton?: boolean;
@@ -13,7 +14,7 @@ interface NavbarProps {
 export default function Navbar({ showBackButton = false }: NavbarProps) {
   const t = useTranslations('navigation');
   const locale = useLocale();
-  const [activeSection, setActiveSection] = useState('hero'); // ✅ Default ke hero
+  const [activeSection, setActiveSection] = useState('hero');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -87,11 +88,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 font-poppins ${
-      isScrolled 
-        ? 'bg-white/95 backdrop-blur-md shadow-lg' 
-        : 'bg-transparent'
-    }`}>
+    <nav className={`navbar-base ${isScrolled ? 'navbar-scrolled' : 'navbar-transparent'}`}>
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -103,7 +100,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center transition-all duration-200 group-hover:scale-110 group-hover:rotate-3">
               <span className="text-white font-bold text-lg font-poppins">T</span>
             </div>
-            <span className="text-2xl font-bold text-gray-800 font-poppins transition-colors duration-200 group-hover:text-indigo-600">
+            <span className="nav-logo text-2xl font-bold font-poppins transition-colors duration-200 group-hover:text-indigo-600">
               TypoDetector
             </span>
           </Link>
@@ -114,28 +111,22 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
               {/* Home/Hero Link */}
               <button
                 onClick={scrollToTop}
-                className={`relative text-gray-600 hover:text-indigo-600 transition-all duration-200 font-medium font-poppins group focus:outline-none ${
-                  activeSection === 'hero' ? 'text-indigo-600' : ''
+                className={`nav-link font-medium font-poppins group focus:outline-none transition-colors duration-200 ${
+                  activeSection === 'hero' ? 'active text-indigo-600' : 'hover:text-indigo-600'
                 }`}
               >
                 {t('home')}
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-indigo-600 transition-all duration-300 ${
-                  activeSection === 'hero' ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}></span>
               </button>
 
               {navLinks.map((link) => (
                 <button
                   key={link.id}
                   onClick={() => smoothScrollTo(link.id)}
-                  className={`relative text-gray-600 hover:text-indigo-600 transition-all duration-200 font-medium font-poppins group focus:outline-none ${
-                    activeSection === link.id ? 'text-indigo-600' : ''
+                  className={`nav-link font-medium font-poppins group focus:outline-none transition-colors duration-200 ${
+                    activeSection === link.id ? 'active text-indigo-600' : 'hover:text-indigo-600'
                   }`}
                 >
                   {link.label}
-                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-indigo-600 transition-all duration-300 ${
-                    activeSection === link.id ? 'w-full' : 'w-0 group-hover:w-full'
-                  }`}></span>
                 </button>
               ))}
               
@@ -146,18 +137,22 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                 {t('getStarted')}
               </Link>
 
-              {/* Language Switcher */}
-              <LanguageSwitcher />
+              {/* Right Controls */}
+              <div className="flex items-center space-x-3">
+                <ThemeToggle />
+                <LanguageSwitcher />
+              </div>
             </div>
           )}
 
           {/* Mobile Menu Button */}
           {!showBackButton && (
-            <div className="lg:hidden flex items-center space-x-4">
+            <div className="lg:hidden flex items-center space-x-3">
+              <ThemeToggle />
               <LanguageSwitcher />
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-600 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+                className="nav-link p-2 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isMobileMenuOpen ? (
@@ -170,30 +165,19 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
             </div>
           )}
 
-          {/* Back Button for Upload Page - Responsive */}
+          {/* Back Button */}
           {showBackButton && (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
+              <ThemeToggle />
               <LanguageSwitcher />
-              {/* Desktop - Text with Icon */}
               <Link 
                 href={`/${locale}`}
-                className="hidden lg:flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 font-poppins group focus:outline-none"
+                className="nav-link hidden lg:flex items-center space-x-2 hover:text-indigo-700 font-medium transition-colors duration-200 font-poppins group focus:outline-none"
               >
                 <svg className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>{t('backToHome')}</span>
-              </Link>
-              
-              {/* Mobile - Icon Only */}
-              <Link 
-                href={`/${locale}`}
-                className="lg:hidden flex items-center justify-center w-10 h-10 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-all duration-200 font-poppins group focus:outline-none"
-                title={t('backToHome')}
-              >
-                <svg className="w-5 h-5 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
               </Link>
             </div>
           )}
@@ -204,37 +188,29 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
           <div className={`lg:hidden transition-all duration-300 overflow-hidden ${
             isMobileMenuOpen ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'
           }`}>
-            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
-              {/* Home Button for Mobile */}
+            <div className="mobile-menu rounded-xl shadow-lg p-6 space-y-4">
               <button
                 onClick={scrollToTop}
-                className={`block w-full text-left text-gray-600 hover:text-indigo-600 transition-all duration-200 font-medium font-poppins py-2 relative focus:outline-none ${
-                  activeSection === 'hero' ? 'text-indigo-600' : ''
+                className={`nav-link block w-full text-left font-medium font-poppins py-2 relative focus:outline-none ${
+                  activeSection === 'hero' ? 'active' : ''
                 }`}
               >
                 {t('home')}
-                {activeSection === 'hero' && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></span>
-                )}
               </button>
 
               {navLinks.map((link, index) => (
                 <button
                   key={link.id}
                   onClick={() => smoothScrollTo(link.id)}
-                  className={`block w-full text-left text-gray-600 hover:text-indigo-600 transition-all duration-200 font-medium font-poppins py-2 relative focus:outline-none ${
-                    activeSection === link.id ? 'text-indigo-600' : ''
+                  className={`nav-link block w-full text-left font-medium font-poppins py-2 relative focus:outline-none ${
+                    activeSection === link.id ? 'active' : ''
                   }`}
-                  style={{ animationDelay: `${(index + 1) * 100}ms` }}
                 >
                   {link.label}
-                  {activeSection === link.id && (
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></span>
-                  )}
                 </button>
               ))}
               
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
                 <Link 
                   href={`/${locale}/upload`}
                   className="block w-full text-center bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-poppins focus:outline-none"

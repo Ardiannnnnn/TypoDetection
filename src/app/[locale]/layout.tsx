@@ -1,55 +1,41 @@
-import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
-import {notFound} from 'next/navigation';
-import type { Metadata } from 'next';
-import '../globals.css';
-import { poppins } from '../fonts';
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import "../globals.css";
+import { poppins } from "../fonts";
+import { Providers } from "./providers";
 
-
-const locales = ['en', 'id'];
+const locales = ["en", "id"];
 
 export const metadata: Metadata = {
-  title: 'TypoDetector',
-  description: 'Automatically detect typos in your thesis or final project report with AI technology. Fast, accurate, and supports PDF files.',
-  icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
-  },
+  title: "TypoDetector",
+  description: "Automatically detect typos in your thesis...",
+  icons: { icon: "/favicon.svg" },
 };
 
 export function generateStaticParams() {
-  return locales.map((locale) => ({locale}));
+  return locales.map((locale) => ({ locale }));
 }
 
 export default async function LocaleLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }) {
-  const {locale} = await params;
-  
-  // ✅ Debug logs di server side
-  console.log('🔧 Layout - Received locale:', locale);
-  
-  if (!locales.includes(locale)) {
-    console.log('❌ Layout - Invalid locale, calling notFound');
-    notFound();
-  }
+  const { locale } = await params;
+  if (!locales.includes(locale)) notFound();
 
   const messages = await getMessages();
-  console.log('📄 Layout - Messages loaded for locale:', locale);
-  console.log('🎯 Layout - Sample message:', messages?.hero?.title);
 
-  return (
-    <html lang={locale} className={poppins.variable}>
-      <body className={poppins.className}>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  );
+return (
+  <html lang={locale} className={poppins.variable} suppressHydrationWarning>
+    <body className={poppins.className}>
+      <Providers messages={messages} locale={locale}>
+        {children}
+      </Providers>
+    </body>
+  </html>
+);
 }
