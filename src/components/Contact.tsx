@@ -17,22 +17,21 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Function to render text with highlight
-  // ✅ Function yang sama untuk semua components
-const renderTextWithHighlight = (text: string) => {
-  return text
-    .split('##HIGHLIGHT_START##')
-    .map((part, index) => {
-      if (index === 0) return part;
-      const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
-      return (
-        <span key={index}>
-          <span className="text-indigo-600">{highlighted}</span>
-          {rest.join('##HIGHLIGHT_END##')}
-        </span>
-      );
-    });
-};
+  // ✅ Updated function with dark mode support
+  const renderTextWithHighlight = (text: string) => {
+    return text
+      .split('##HIGHLIGHT_START##')
+      .map((part, index) => {
+        if (index === 0) return part;
+        const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
+        return (
+          <span key={index}>
+            <span className="text-indigo-600 dark:text-indigo-400">{highlighted}</span>
+            {rest.join('##HIGHLIGHT_END##')}
+          </span>
+        );
+      });
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,19 +89,19 @@ const renderTextWithHighlight = (text: string) => {
 
   if (submitted) {
     return (
-      <section id="contact" className="py-20 bg-white">
+      <section id="contact" className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-green-50 p-8 rounded-2xl">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-green-50 dark:bg-green-900/20 p-8 rounded-2xl border border-green-200 dark:border-green-800">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 font-poppins">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 font-poppins">
                 {t('form.success.title')}
               </h3>
-              <p className="text-gray-600 mb-6 font-poppins">
+              <p className="text-gray-600 dark:text-gray-300 mb-6 font-poppins">
                 {t('form.success.message')}
               </p>
               <button
@@ -119,16 +118,16 @@ const renderTextWithHighlight = (text: string) => {
   }
 
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-6">
         <div 
           ref={sectionRef}
           className="text-center mb-16 opacity-0 translate-y-8 transition-all duration-1000 ease-out"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-6 font-poppins">
+          <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-6 font-poppins">
             {renderTextWithHighlight(t('title'))}
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-poppins">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed font-poppins">
             {t('subtitle')}
           </p>
         </div>
@@ -139,86 +138,86 @@ const renderTextWithHighlight = (text: string) => {
             ref={formRef}
             className="opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300"
           >
-            <h3 className="text-2xl font-bold text-gray-800 mb-8 font-poppins">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-8 font-poppins">
               {t('letsTalk')}
             </h3>
             
             <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
                     {t('info.email.title')}
                   </h4>
-                  <p className="text-gray-600 font-poppins">{t('info.email.support')}</p>
-                  <p className="text-gray-600 font-poppins">{t('info.email.feedback')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.email.support')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.email.feedback')}</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
                     {t('info.responseTime.title')}
                   </h4>
-                  <p className="text-gray-600 font-poppins">{t('info.responseTime.time')}</p>
-                  <p className="text-gray-600 font-poppins">{t('info.responseTime.availability')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.responseTime.time')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.responseTime.availability')}</p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-800 mb-2 font-poppins">
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
                     {t('info.location.title')}
                   </h4>
-                  <p className="text-gray-600 font-poppins">{t('info.location.country')}</p>
-                  <p className="text-gray-600 font-poppins">{t('info.location.timezone')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.location.country')}</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-poppins">{t('info.location.timezone')}</p>
                 </div>
               </div>
             </div>
 
             {/* FAQ Section */}
-            <div className="mt-12 p-6 bg-gray-50 rounded-xl">
-              <h4 className="text-lg font-semibold text-gray-800 mb-4 font-poppins">
+            <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 font-poppins">
                 {t('faq.title')}
               </h4>
               <div className="space-y-3 text-sm">
-                <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">Q:</span> {t('faq.questions.dataSecurity.question')}
+                <p className="text-gray-600 dark:text-gray-300 font-poppins">
+                  <span className="font-medium text-gray-800 dark:text-white">Q:</span> {t('faq.questions.dataSecurity.question')}
                 </p>
-                <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">A:</span> {t('faq.questions.dataSecurity.answer')}
+                <p className="text-gray-600 dark:text-gray-300 font-poppins">
+                  <span className="font-medium text-gray-800 dark:text-white">A:</span> {t('faq.questions.dataSecurity.answer')}
                 </p>
-                <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">Q:</span> {t('faq.questions.fileFormats.question')}
+                <p className="text-gray-600 dark:text-gray-300 font-poppins">
+                  <span className="font-medium text-gray-800 dark:text-white">Q:</span> {t('faq.questions.fileFormats.question')}
                 </p>
-                <p className="text-gray-600 font-poppins">
-                  <span className="font-medium">A:</span> {t('faq.questions.fileFormats.answer')}
+                <p className="text-gray-600 dark:text-gray-300 font-poppins">
+                  <span className="font-medium text-gray-800 dark:text-white">A:</span> {t('faq.questions.fileFormats.answer')}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-2xl">
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-8 rounded-2xl border border-transparent dark:border-gray-600">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                     {t('form.name')} *
                   </label>
                   <input
@@ -227,13 +226,13 @@ const renderTextWithHighlight = (text: string) => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 font-poppins text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder={t('form.placeholders.name')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                     {t('form.email')} *
                   </label>
                   <input
@@ -242,14 +241,14 @@ const renderTextWithHighlight = (text: string) => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 font-poppins text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder={t('form.placeholders.email')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                   {t('form.subject')} *
                 </label>
                 <select
@@ -257,17 +256,17 @@ const renderTextWithHighlight = (text: string) => {
                   value={formData.subject}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 font-poppins text-gray-800 placeholder:text-gray-400"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 font-poppins text-gray-800 dark:text-white bg-white dark:bg-gray-900"
                 >
-                  <option value="">{t('form.placeholders.subject')}</option>
+                  <option value="" className="text-gray-400 dark:text-gray-500">{t('form.placeholders.subject')}</option>
                   {subjects.map((subject) => (
-                    <option key={subject} value={subject}>{subject}</option>
+                    <option key={subject} value={subject} className="text-gray-800 dark:text-white">{subject}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                   {t('form.rating')}
                 </label>
                 <div className="flex space-x-2">
@@ -276,7 +275,7 @@ const renderTextWithHighlight = (text: string) => {
                       key={star}
                       type="button"
                       onClick={() => setFormData({...formData, rating: star})}
-                      className={`w-8 h-8 ${star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'} hover:text-yellow-400 transition-colors duration-200`}
+                      className={`w-8 h-8 ${star <= formData.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'} hover:text-yellow-400 transition-colors duration-200`}
                     >
                       <svg fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -287,7 +286,7 @@ const renderTextWithHighlight = (text: string) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 font-poppins">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-poppins">
                   {t('form.message')} *
                 </label>
                 <textarea
@@ -296,7 +295,7 @@ const renderTextWithHighlight = (text: string) => {
                   onChange={handleInputChange}
                   required
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none font-poppins text-gray-800"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 resize-none font-poppins text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder={t('form.placeholders.message')}
                 />
               </div>
@@ -306,7 +305,7 @@ const renderTextWithHighlight = (text: string) => {
                 disabled={isSubmitting}
                 className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform font-poppins ${
                   isSubmitting
-                    ? 'bg-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                     : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl'
                 } text-white`}
               >
