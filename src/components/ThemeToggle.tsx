@@ -1,116 +1,123 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { useState, useEffect } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function ModeToggle() {
   const [mounted, setMounted] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
 
-  // ✅ Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // ✅ Debug logging
-  useEffect(() => {
-    console.log('🌙 Theme Debug:', { theme, resolvedTheme, mounted });
-  }, [theme, resolvedTheme, mounted]);
-
   if (!mounted) {
     return (
-      <div className="h-9 w-9 rounded-md border border-gray-200 dark:border-gray-700 animate-pulse bg-gray-100 dark:bg-gray-800"></div>
+      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-gray-200 dark:border-gray-700 animate-pulse bg-gray-100 dark:bg-gray-800"></div>
     );
   }
 
   const handleToggle = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    console.log('🔄 Toggling theme from', theme, 'to', newTheme);
+    if (isTransitioning) return; // Prevent double clicks
+
+    setIsTransitioning(true);
+    const html = document.documentElement;
+
+    // ✅ Shorter transition untuk mobile
+    html.classList.add("theme-transition");
+
+    const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
+
+    // ✅ Faster cleanup untuk mobile performance
+    setTimeout(() => {
+      html.classList.remove("theme-transition");
+      setIsTransitioning(false);
+    }, 300); // Reduced dari 500ms ke 300ms
   };
 
-  // ✅ Use resolvedTheme for accurate detection
   const currentTheme = resolvedTheme || theme;
-  const isDark = currentTheme === 'dark';
+  const isDark = currentTheme === "dark";
 
   return (
     <button
       onClick={handleToggle}
+      disabled={isTransitioning}
       className="
-        relative h-9 w-9 rounded-md border border-gray-200 dark:border-gray-700
+        relative h-8 w-8 sm:h-9 sm:w-9 rounded-lg border border-gray-200 dark:border-gray-700
         bg-white dark:bg-gray-800
         hover:bg-gray-50 dark:hover:bg-gray-700
-        transition-all duration-300 ease-in-out
-        hover:scale-105 active:scale-95
+        transition-all duration-200 ease-out
+        active:scale-90 sm:hover:scale-105 sm:active:scale-95
         focus:outline-none
-        focus:ring-0
-        focus:border-indigo-500 dark:focus:border-indigo-400
-        focus:shadow-lg
-        overflow-hidden
+        disabled:opacity-70
+        touch-manipulation
       "
       style={{
-        outline: 'none',
-        boxShadow: 'none',
-        WebkitTapHighlightColor: 'transparent'
+        outline: "none",
+        boxShadow: "none",
+        WebkitTapHighlightColor: "transparent",
       }}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
-      {/* ✅ Sun Icon - Show in dark mode (click to go light) */}
-      <Sun 
-        className={`
-          absolute inset-0 m-auto h-4 w-4 text-yellow-500
-          transition-all duration-500 ease-in-out
-          ${isDark 
-            ? 'scale-100 rotate-0 opacity-100' 
-            : 'scale-0 rotate-90 opacity-0'
-          }
-        `} 
-      />
-      
-      {/* ✅ Moon Icon - Show in light mode (click to go dark) */}
-      <Moon 
-        className={`
-          absolute inset-0 m-auto h-4 w-4 text-slate-700 dark:text-slate-300
-          transition-all duration-500 ease-in-out
-          ${!isDark 
-            ? 'scale-100 rotate-0 opacity-100' 
-            : 'scale-0 -rotate-90 opacity-0'
-          }
-        `} 
-      />
+      {/* ✅ Simplified animations untuk mobile */}
+      <div className="relative w-full h-full flex items-center justify-center">
+        {/* Sun Icon */}
+        <Sun
+          className={`
+            absolute h-3 w-3 sm:h-4 sm:w-4 text-yellow-500
+            transition-all duration-300 ease-out
+            ${
+              isDark
+                ? "scale-100 opacity-100"
+                : "scale-0 opacity-0"
+            }
+          `}
+        />
 
-      {/* ✅ Background transition effect */}
-      <div 
+        {/* Moon Icon */}
+        <Moon
+          className={`
+            absolute h-3 w-3 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-300
+            transition-all duration-300 ease-out
+            ${
+              !isDark
+                ? "scale-100 opacity-100"
+                : "scale-0 opacity-0"
+            }
+          `}
+        />
+      </div>
+
+      {/* ✅ Simplified background effect - only for desktop */}
+      <div
         className={`
-          absolute inset-0 rounded-md transition-all duration-300 ease-in-out
-          ${isDark 
-            ? 'bg-gradient-to-tr from-slate-800 to-slate-700' 
-            : 'bg-gradient-to-tr from-amber-50 to-yellow-50'
+          absolute inset-0 rounded-lg transition-all duration-200 ease-out
+          hidden sm:block
+          ${
+            isDark
+              ? "bg-slate-100/5"
+              : "bg-yellow-100/20"
           }
-          -z-10
+          opacity-0 hover:opacity-100
         `}
       />
 
-      {/* ✅ Custom focus indicator (subtle glow) */}
-      <div 
+      {/* ✅ Mobile-specific active state */}
+      <div
         className={`
-          absolute inset-0 rounded-md transition-all duration-200
-          ${isDark 
-            ? 'shadow-indigo-400/20' 
-            : 'shadow-indigo-500/20'
-          }
-          opacity-0 focus-within:opacity-100
-          -z-20
+          absolute inset-0 rounded-lg transition-all duration-150 ease-out
+          sm:hidden
+          ${isTransitioning ? "bg-gray-200 dark:bg-gray-600" : ""}
+          ${isDark ? "bg-blue-500/10" : "bg-yellow-500/10"}
+          opacity-0 active:opacity-100
         `}
-        style={{
-          boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)'
-        }}
       />
     </button>
   );
 }
 
-// ✅ Export as default juga untuk compatibility
 export default ModeToggle;

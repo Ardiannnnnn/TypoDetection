@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import {ModeToggle} from './ThemeToggle';
+import FlagIcon from './FlagIcon';
 
 interface NavbarProps {
   showBackButton?: boolean;
@@ -14,6 +15,7 @@ interface NavbarProps {
 export default function Navbar({ showBackButton = false }: NavbarProps) {
   const t = useTranslations('navigation');
   const locale = useLocale();
+   const router = useRouter(); 
   const [activeSection, setActiveSection] = useState('hero');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -119,7 +121,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                 : 'text-gray-800 dark:text-white'
             }`}>
               <span className="hidden sm:inline">TypoDetector</span>
-              <span className="sm:hidden">Typo</span>
+              <span className="sm:hidden">TypoDetector</span>
             </span>
           </Link>
 
@@ -222,17 +224,83 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                       <ModeToggle />
                     </div>
 
-                    {/* Language Toggle Row */}
-                    <div className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
-                          <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                          </svg>
+                    {/* ✅ Language Toggle Row - CUSTOM IMPLEMENTATION untuk Mobile */}
+                    <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                            </svg>
+                          </div>
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 font-poppins">Language</span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 font-poppins">Language</span>
                       </div>
-                      <LanguageSwitcher />
+                      
+                      {/* ✅ Custom Language Buttons untuk Mobile */}
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            if (locale !== 'en') {
+                              const segments = pathname.split("/");
+                              if (segments[1] && ["en", "id"].includes(segments[1])) {
+                                segments[1] = 'en';
+                              } else {
+                                segments.splice(1, 0, 'en');
+                              }
+                              const newPath = segments.join("/");
+                              router.push(newPath);
+                              setIsMobileControlsOpen(false);
+                            }
+                          }}
+                          className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200 text-sm ${
+                            locale === 'en' 
+                              ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' 
+                              : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <div className="w-5 h-5 flex items-center justify-center">
+                            <FlagIcon country="US" className="w-5 h-5" />
+                          </div>
+                          <span className="flex-1 text-left font-medium font-poppins">English</span>
+                          {locale === 'en' && (
+                            <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            if (locale !== 'id') {
+                              const segments = pathname.split("/");
+                              if (segments[1] && ["en", "id"].includes(segments[1])) {
+                                segments[1] = 'id';
+                              } else {
+                                segments.splice(1, 0, 'id');
+                              }
+                              const newPath = segments.join("/");
+                              router.push(newPath);
+                              setIsMobileControlsOpen(false);
+                            }
+                          }}
+                          className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200 text-sm ${
+                            locale === 'id' 
+                              ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' 
+                              : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <div className="w-5 h-5 flex items-center justify-center">
+                            <FlagIcon country="ID" className="w-5 h-5" />
+                          </div>
+                          <span className="flex-1 text-left font-medium font-poppins">Indonesia</span>
+                          {locale === 'id' && (
+                            <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Get Started Button in Mobile */}
@@ -272,7 +340,7 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
           {/* Back Button with Mobile Controls */}
           {showBackButton && (
             <div className="flex items-center space-x-2">
-              {/* ✅ Mobile Controls for Upload Page */}
+              {/* ✅ Mobile Controls for Upload Page - FIXED VERSION */}
               <div className="lg:hidden relative">
                 <button
                   onClick={(e) => {
@@ -292,19 +360,72 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                 </button>
 
                 {isMobileControlsOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                     <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-600">
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-300 font-poppins">Settings</p>
                     </div>
                     
+                    {/* Theme Row */}
                     <div className="px-3 py-2 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
                       <span className="text-xs text-gray-700 dark:text-gray-300 font-poppins">Theme</span>
                       <ModeToggle />
                     </div>
 
-                    <div className="px-3 py-2 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <span className="text-xs text-gray-700 dark:text-gray-300 font-poppins">Language</span>
-                      <LanguageSwitcher />
+                    {/* ✅ Language Row - Custom Implementation */}
+                    <div className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-700 dark:text-gray-300 font-poppins">Language</span>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            if (locale !== 'en') {
+                              const segments = pathname.split("/");
+                              if (segments[1] && ["en", "id"].includes(segments[1])) {
+                                segments[1] = 'en';
+                              } else {
+                                segments.splice(1, 0, 'en');
+                              }
+                              const newPath = segments.join("/");
+                              router.push(newPath);
+                              setIsMobileControlsOpen(false);
+                            }
+                          }}
+                          className={`flex-1 flex items-center justify-center space-x-1 px-2 py-1 rounded text-xs transition-colors duration-200 ${
+                            locale === 'en' 
+                              ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' 
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <FlagIcon country="US" className="w-3 h-3" />
+                          <span className="font-poppins">EN</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            if (locale !== 'id') {
+                              const segments = pathname.split("/");
+                              if (segments[1] && ["en", "id"].includes(segments[1])) {
+                                segments[1] = 'id';
+                              } else {
+                                segments.splice(1, 0, 'id');
+                              }
+                              const newPath = segments.join("/");
+                              router.push(newPath);
+                              setIsMobileControlsOpen(false);
+                            }
+                          }}
+                          className={`flex-1 flex items-center justify-center space-x-1 px-2 py-1 rounded text-xs transition-colors duration-200 ${
+                            locale === 'id' 
+                              ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400' 
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          <FlagIcon country="ID" className="w-3 h-3" />
+                          <span className="font-poppins">ID</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}

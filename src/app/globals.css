@@ -8,6 +8,12 @@ html {
   scroll-padding-top: 100px; /* Account for fixed navbar */
 }
 
+/* globals.css */
+.theme-transition * {
+  @apply transition-colors duration-300;
+}
+
+
 /* Poppins utility classes */
 .font-poppins {
   font-family: var(--font-poppins);
