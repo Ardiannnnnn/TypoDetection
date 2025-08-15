@@ -175,15 +175,15 @@ export default function Home() {
                 </h2>
                 <div className="grid md:grid-cols-3 gap-8">
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">99.8%</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">0%</div>
                     <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.accuracy')}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">10,000+</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">+</div>
                     <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.documents')}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">5,000+</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">5+</div>
                     <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.users')}</div>
                   </div>
                 </div>
