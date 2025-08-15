@@ -37,19 +37,19 @@
   "about": {
     "title": "About ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
     "subtitle": "TypoDetector is an advanced AI application designed to help you detect and correct typos in your final project reports or theses, aiming to enhance the quality of your writing.",
-    "whyChoose": "Why Choose TypoDetector?",
+    "whyChoose": "Why We Created TypoDetector?",
     "features": {
       "aiTechnology": {
-        "title": "Advanced AI Technology",
-        "description": "Using the latest machine learning algorithms to detect typos with up to 99.8% accuracy."
+        "title": "Manual Proofreading is Time-Consuming",
+        "description": "Students often spend countless hours manually checking their thesis for typos, taking away valuable time from research and content improvement."
       },
       "security": {
-        "title": "Guaranteed Security",
-        "description": "Your documents are processed locally and not stored on our servers, ensuring data privacy and security."
+        "title": "Human Eye Misses Hidden Errors",
+        "description": "After reading the same document repeatedly, students become blind to their own mistakes, missing critical typos that could affect their final grade."
       },
       "easyToUse": {
-        "title": "Easy to Use",
-        "description": "Intuitive interface allows you to detect typos in just a few clicks."
+        "title": "Limited Access to Professional Editors",
+        "description": "Not all students have access to professional proofreading services due to cost constraints, leaving them vulnerable to submission errors."
       }
     },
     "mission": {

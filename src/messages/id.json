@@ -37,19 +37,19 @@
   "about": {
     "title": "Tentang ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
     "subtitle": "TypoDetector adalah aplikasi AI canggih yang dirancang untuk membantu Anda mendeteksi dan memperbaiki kesalahan pengetikan dalam laporan tugas akhir atau skripsi anda, kami mengharapkan aplikasi ini dapat meningkatkan kualitas tulisan Anda.",
-    "whyChoose": "Mengapa Memilih TypoDetector?",
+    "whyChoose": "Mengapa Kami Membuat TypoDetector?",
     "features": {
       "aiTechnology": {
-        "title": "Teknologi AI Terdepan",
-        "description": "Menggunakan algoritma machine learning terbaru untuk mendeteksi typo dengan akurasi hingga 99.8%."
+        "title": "Proofreading Manual Memakan Waktu",
+        "description": "Mahasiswa sering menghabiskan berjam-jam untuk memeriksa typo secara manual pada skripsi mereka, mengambil waktu berharga dari penelitian dan perbaikan konten."
       },
       "security": {
-        "title": "Keamanan Terjamin",
-        "description": "Dokumen Anda diproses secara lokal dan tidak disimpan di server kami, menjamin privasi dan keamanan data."
+        "title": "Mata Manusia Melewatkan Kesalahan Tersembunyi",
+        "description": "Setelah membaca dokumen yang sama berulang kali, mahasiswa menjadi buta terhadap kesalahan mereka sendiri, melewatkan typo kritis yang dapat mempengaruhi nilai akhir."
       },
       "easyToUse": {
-        "title": "Mudah Digunakan",
-        "description": "Interface yang intuitif memungkinkan Anda mendeteksi typo hanya dalam beberapa klik."
+        "title": "Akses Terbatas ke Editor Profesional",
+        "description": "Tidak semua mahasiswa memiliki akses ke layanan proofreading profesional karena keterbatasan biaya, meninggalkan mereka rentan terhadap kesalahan submission."
       }
     },
     "mission": {
