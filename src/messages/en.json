@@ -156,45 +156,53 @@
     "title": "AI-Powered PDF Typo Detection",
     "subtitle": "Upload your PDF document and let our advanced AI analyze it for spelling errors, grammar mistakes, and typos with incredible accuracy.",
     "uploadSection": {
-      "title": "Upload PDF Document",
+      "title": "Upload Your Thesis PDF",
       "dragDrop": "Drag & drop your PDF file here",
-      "or": "or click to browse files",
-      "support": "Supports: PDF files up to 50MB",
-      "ready": "PDF Ready for Analysis",
-      "size": "Size"
-    },
-    "buttons": {
-      "removeFile": "Remove File",
-      "analyzeDesktop": "Start Typo Analysis",
-      "analyzeMobile": "Analyze PDF",
-      "analyzing": "Analyzing PDF... Please wait",
-      "analyzingMobile": "Analyzing...",
-      "downloadPdf": "Download PDF",
-      "newAnalysisDesktop": "Analyze Another PDF",
-      "newAnalysisMobile": "New Analysis"
+      "or": "or",
+      "support": "Only PDF files are supported.",
+      "ready": "File ready to analyze",
+      "size": "File size"
     },
     "results": {
-      "title": "Analysis Complete! 🎉",
+      "details": {
+        "title": "Analysis Details",
+        "typosTable": {
+          "title": "Detected Typos",
+          "headers": {
+            "word": "Word",
+            "suggestion": "Suggestion",
+            "page": "Page"
+          },
+          "empty": "No typos found."
+        }
+      },
+      "title": "Analysis Summary",
       "stats": {
         "pages": "Pages",
         "words": "Words",
         "typos": "Typos",
         "accuracy": "Accuracy",
-        "time": "Time"
+        "time": "Time",
+        "foreign": "Foreign Words"
       },
       "correctedPdf": {
-        "title": "Corrected PDF",
-        "subtitle": "(Typos Highlighted)",
-        "generating": "Generating corrected PDF..."
-      },
-      "typosList": {
-        "title": "Detected Typos",
-        "errors": "errors"
+        "title": "Corrected PDF Preview",
+        "subtitle": "Typos highlighted",
+        "generating": "Generating preview..."
       }
     },
+    "buttons": {
+      "downloadPdf": "Download PDF",
+      "downloadResults": "Download Results",
+      "removeFile": "Remove File",
+      "analyzeDesktop": "Analyze Document",
+      "analyzeMobile": "Analyze",
+      "analyzing": "Analyzing...",
+      "analyzingMobile": "Processing..."
+    },
     "alerts": {
-      "pdfOnly": "Please upload a PDF file (.pdf)",
-      "pdfGenerating": "PDF with highlighted typos is being generated..."
+      "pdfOnly": "Only PDF files are allowed.",
+      "pdfGenerating": "PDF preview is being generated."
     }
   },
   "footer": {
