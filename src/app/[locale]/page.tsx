@@ -101,7 +101,7 @@ export default function Home() {
                 </Link>
                 <button
                   onClick={() => {
-                    const aboutSection = document.getElementById("about");
+                    const aboutSection = document.getElementById("how-it-works");
                     if (aboutSection) {
                       aboutSection.scrollIntoView({
                         behavior: "smooth",
