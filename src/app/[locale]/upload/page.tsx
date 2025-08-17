@@ -406,7 +406,7 @@ export default function UploadPage() {
               <button
                 onClick={handleDownload}
                 disabled={progressData?.status !== "completed"}
-                className={`text-sm mt-8 w-full px-6 py-3 rounded-lg font-semibold text-base transition-colors font-poppins
+                className={`text-sm mt-8 w-full px-6 py-3 rounded-lg font-semibold transition-colors font-poppins
     ${
       progressData?.status === "completed"
         ? "bg-green-600 dark:bg-green-500 text-white hover:bg-green-700 dark:hover:bg-green-600 shadow-lg hover:shadow-xl"
