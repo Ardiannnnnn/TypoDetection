@@ -66,7 +66,7 @@
     "steps": {
       "upload": {
         "title": "Upload PDF",
-        "description": "Choose and upload the PDF document you want to check. Our system supports various PDF formats."
+        "description": "Upload the PDF document you want to check. Our system supports various PDF formats."
       },
       "aiAnalysis": {
         "title": "AI Analysis",
