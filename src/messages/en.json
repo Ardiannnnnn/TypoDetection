@@ -160,12 +160,11 @@
       "dragDrop": "Drag & drop your PDF file here",
       "or": "or",
       "support": "Only PDF files are supported.",
-      "ready": "File ready to analyze",
       "size": "File size"
     },
     "results": {
       "details": {
-        "title": "Analysis Details",
+        "title": "This Is Your Final Result Analysis ",
         "typosTable": {
           "title": "Detected Typos",
           "headers": {
