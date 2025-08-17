@@ -170,26 +170,36 @@
       "analyzing": "Menganalisis PDF... Harap tunggu",
       "analyzingMobile": "Menganalisis...",
       "downloadPdf": "Unduh PDF",
+      "downloadResults": "Unduh Hasil",
       "newAnalysisDesktop": "Analisis PDF Lain",
       "newAnalysisMobile": "Analisis Baru"
     },
     "results": {
-      "title": "Analisis Selesai! 🎉",
+      "details": {
+        "title": "Ini adalah hasil akhir analisis Anda",
+        "typosTable": {
+          "title": "Typo yang Terdeteksi",
+          "headers": {
+            "word": "Kata",
+            "suggestion": "Saran",
+            "page": "Halaman"
+          },
+          "empty": "Tidak ada typo ditemukan."
+        }
+      },
+      "title": "Ringkasan Analisis",
       "stats": {
         "pages": "Halaman",
         "words": "Kata",
         "typos": "Typo",
         "accuracy": "Akurasi",
-        "time": "Waktu"
+        "time": "Waktu",
+        "foreign": "Kata Asing"
       },
       "correctedPdf": {
-        "title": "PDF yang Diperbaiki",
-        "subtitle": "(Typo Disorot)",
-        "generating": "Membuat PDF yang diperbaiki..."
-      },
-      "typosList": {
-        "title": "Typo yang Terdeteksi",
-        "errors": "kesalahan"
+        "title": "Pratinjau PDF yang Diperbaiki",
+        "subtitle": "Typo disorot",
+        "generating": "Membuat pratinjau..."
       }
     },
     "alerts": {
