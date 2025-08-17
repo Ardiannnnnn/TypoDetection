@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useTranslations, useLocale } from 'next-intl';
-import Navbar from '@/components/Navbar';
-import About from '@/components/About';
-import HowItWorks from '@/components/Features';
-import Contact from '@/components/Contact';
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
+import Navbar from "@/components/Navbar";
+import About from "@/components/About";
+import HowItWorks from "@/components/Features";
+import Contact from "@/components/Contact";
 
 export default function Home() {
   const t = useTranslations();
@@ -21,14 +21,14 @@ export default function Home() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.remove('opacity-0', 'translate-y-8');
-            entry.target.classList.add('opacity-100', 'translate-y-0');
+            entry.target.classList.remove("opacity-0", "translate-y-8");
+            entry.target.classList.add("opacity-100", "translate-y-0");
           }
         });
       },
       {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        rootMargin: "0px 0px -50px 0px",
       }
     );
 
@@ -44,22 +44,22 @@ export default function Home() {
 
   // ✅ Updated function to handle safe placeholders
   const renderTextWithHighlight = (text: string) => {
-    return text
-      .split('##HIGHLIGHT_START##')
-      .map((part, index) => {
-        if (index === 0) return part;
-        const [highlighted, ...rest] = part.split('##HIGHLIGHT_END##');
-        return (
-          <span key={index}>
-            <span className="text-indigo-600 dark:text-indigo-400 animate-pulse">{highlighted}</span>
-            {rest.join('##HIGHLIGHT_END##')}
+    return text.split("##HIGHLIGHT_START##").map((part, index) => {
+      if (index === 0) return part;
+      const [highlighted, ...rest] = part.split("##HIGHLIGHT_END##");
+      return (
+        <span key={index}>
+          <span className="text-indigo-600 dark:text-indigo-400 animate-pulse">
+            {highlighted}
           </span>
-        );
-      });
+          {rest.join("##HIGHLIGHT_END##")}
+        </span>
+      );
+    });
   };
 
   const renderTitleWithLineBreak = (text: string) => {
-    return text.split('##BR##').map((part, index) => (
+    return text.split("##BR##").map((part, index) => (
       <span key={index}>
         {index > 0 && <br />}
         {renderTextWithHighlight(part)}
@@ -70,12 +70,12 @@ export default function Home() {
   return (
     <div className="min-h-screen font-poppins bg-gradient-to-br from-blue-50 to-indigo-100 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <Navbar />
-      
+
       <div id="hero" className="pt-20">
         <main className="container mx-auto px-6 py-16">
           <div className="text-center max-w-4xl mx-auto">
             {/* Hero Title and Description */}
-            <div 
+            <div
               ref={heroRef}
               className="opacity-0 translate-y-8 transition-all duration-1000 ease-out"
             >
@@ -86,35 +86,38 @@ export default function Home() {
                 {t("hero.subtitle")}
               </p>
             </div>
-            
+
             {/* Action Buttons */}
-            <div 
+            <div
               ref={buttonsRef}
               className="opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300"
             >
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-                <Link 
+                <Link
                   href={`/${locale}/upload`}
                   className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-2 hover:scale-105 font-poppins"
                 >
-                  {t('hero.uploadDocument')}
+                  {t("hero.uploadDocument")}
                 </Link>
-                <button 
+                <button
                   onClick={() => {
-                    const aboutSection = document.getElementById('about');
+                    const aboutSection = document.getElementById("about");
                     if (aboutSection) {
-                      aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      aboutSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
                     }
                   }}
                   className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 px-8 py-4 rounded-lg text-lg font-semibold border-2 border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 font-poppins"
                 >
-                  {t('hero.learnMore')}
+                  {t("hero.learnMore")}
                 </button>
               </div>
             </div>
 
             {/* Features Grid */}
-            <div 
+            <div
               ref={featuresRef}
               className="opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-600"
             >
@@ -122,69 +125,111 @@ export default function Home() {
                 {/* Feature Cards */}
                 <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-2xl dark:shadow-gray-900/50 transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 border border-transparent dark:border-gray-700">
                   <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3 font-poppins">
-                    {t('features.aiPowered.title')}
+                    {t("features.aiPowered.title")}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 font-poppins">
-                    {t('features.aiPowered.description')}
+                    {t("features.aiPowered.description")}
                   </p>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-2xl dark:shadow-gray-900/50 transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 delay-100 border border-transparent dark:border-gray-700">
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <svg
+                      className="w-8 h-8 text-green-600 dark:text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3 font-poppins">
-                    {t('features.lightningFast.title')}
+                    {t("features.lightningFast.title")}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 font-poppins">
-                    {t('features.lightningFast.description')}
+                    {t("features.lightningFast.description")}
                   </p>
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-2xl dark:shadow-gray-900/50 transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 delay-200 border border-transparent dark:border-gray-700">
                   <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <svg
+                      className="w-8 h-8 text-purple-600 dark:text-purple-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-3 font-poppins">
-                    {t('features.secure.title')}
+                    {t("features.secure.title")}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 font-poppins">
-                    {t('features.secure.description')}
+                    {t("features.secure.description")}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Statistics */}
-            <div 
+            <div
               ref={statsRef}
               className="opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-900"
             >
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 p-8 border border-transparent dark:border-gray-700">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 font-poppins">
-                  {t('stats.title')}
+                  {t("stats.title")}
                 </h2>
                 <div className="grid md:grid-cols-3 gap-8">
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">0%</div>
-                    <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.accuracy')}</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">
+                      0%
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300 font-poppins">
+                      {t("stats.accuracy")}
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">+</div>
-                    <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.documents')}</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">
+                      +
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300 font-poppins">
+                      {t("stats.documents")}
+                    </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">5+</div>
-                    <div className="text-gray-600 dark:text-gray-300 font-poppins">{t('stats.users')}</div>
+                    <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2 font-poppins">
+                      5+
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-300 font-poppins">
+                      {t("stats.users")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -196,118 +241,6 @@ export default function Home() {
         <HowItWorks />
         <Contact />
       </div>
-
-      {/* ✅ Footer Full Width with Dark Mode */}
-      <footer className="w-full bg-gray-900 dark:bg-gray-950 border-t border-gray-700 dark:border-gray-800">
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            {/* Brand Section */}
-            <div className="md:col-span-1">
-              <h3 className="text-xl font-bold text-white dark:text-gray-100 mb-4 font-poppins">
-                {renderTextWithHighlight("##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##")}
-              </h3>
-              <p className="text-gray-300 dark:text-gray-400 text-sm font-poppins leading-relaxed">
-                {t('footer.powered')}
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div className="md:col-span-1">
-              <h4 className="text-lg font-semibold text-white dark:text-gray-100 mb-4 font-poppins">
-                Quick Links
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <button 
-                    onClick={() => {
-                      const heroSection = document.getElementById('hero');
-                      if (heroSection) {
-                        heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }}
-                    className="text-gray-300 dark:text-gray-400 hover:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 text-sm font-poppins"
-                  >
-                    {t('navigation.home')}
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => {
-                      const aboutSection = document.getElementById('about');
-                      if (aboutSection) {
-                        aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }}
-                    className="text-gray-300 dark:text-gray-400 hover:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 text-sm font-poppins"
-                  >
-                    {t('navigation.about')}
-                  </button>
-                </li>
-                <li>
-                  <Link 
-                    href={`/${locale}/upload`}
-                    className="text-gray-300 dark:text-gray-400 hover:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 text-sm font-poppins"
-                  >
-                    Upload PDF
-                  </Link>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => {
-                      const contactSection = document.getElementById('contact');
-                      if (contactSection) {
-                        contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }}
-                    className="text-gray-300 dark:text-gray-400 hover:text-indigo-400 dark:hover:text-indigo-300 transition-colors duration-200 text-sm font-poppins"
-                  >
-                    {t('navigation.contact')}
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div className="md:col-span-1">
-              <h4 className="text-lg font-semibold text-white dark:text-gray-100 mb-4 font-poppins">
-                Contact
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-300 dark:text-gray-400 font-poppins">
-                  📧 support@typodetector.com
-                </p>
-                <p className="text-gray-300 dark:text-gray-400 font-poppins">
-                  🌍 Indonesia
-                </p>
-                <p className="text-gray-300 dark:text-gray-400 font-poppins">
-                  ⏰ 24/7 Support
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Section */}
-          <div className="border-t border-gray-700 dark:border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-center md:text-left">
-                <p className="text-gray-300 dark:text-gray-400 text-sm font-poppins">
-                  {t('footer.copyright')}
-                </p>
-              </div>
-              
-              {/* Social Links or Additional Info */}
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-gray-300 dark:text-gray-400 text-sm font-poppins">
-                    AI Service Online
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

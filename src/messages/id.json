@@ -208,7 +208,9 @@
     }
   },
   "footer": {
-    "copyright": "© 2025 TypoDetector. Hak cipta dilindungi.",
-    "powered": "Didukung oleh Teknologi AI Canggih untuk Deteksi Typo yang Akurat"
+    "powered": "Didukung oleh AI TypoDetector.",
+    "copyright": "© TypoDetector. Semua hak cipta dilindungi.",
+    "allRightsReserved": "Seluruh hak cipta dilindungi."
   }
 }
+  

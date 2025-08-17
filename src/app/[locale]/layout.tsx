@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import "../globals.css";
 import { poppins } from "../fonts";
+import Footer from "@/components/Footer"
 import { Providers } from "./providers";
 
 const locales = ["en", "id"];
@@ -29,13 +30,14 @@ export default async function LocaleLayout({
 
   const messages = await getMessages();
 
-return (
-  <html lang={locale} className={poppins.variable} suppressHydrationWarning>
-    <body className={poppins.className}>
-      <Providers messages={messages} locale={locale}>
-        {children}
-      </Providers>
-    </body>
-  </html>
-);
+  return (
+    <html lang={locale} className={poppins.variable} suppressHydrationWarning>
+      <body className={poppins.className}>
+        <Providers messages={messages} locale={locale}>
+          <main>{children}</main>
+          <Footer />
+        </Providers>
+      </body>
+    </html>
+  );
 }
