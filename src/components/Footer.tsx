@@ -23,15 +23,6 @@ export default function Footer() {
     });
   };
 
-  const renderTitleWithLineBreak = (text: string) => {
-    return text.split("##BR##").map((part, index) => (
-      <span key={index}>
-        {index > 0 && <br />}
-        {renderTextWithHighlight(part)}
-      </span>
-    ));
-  };
-
   return (
     <footer className="w-full bg-gray-900 dark:bg-gray-950 border-t border-gray-700 dark:border-gray-800">
       <div className="container mx-auto px-6 py-12">
@@ -39,7 +30,9 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <h3 className="text-xl font-bold text-white dark:text-gray-100 mb-4 font-poppins">
-              {renderTextWithHighlight("##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##")}
+              {renderTextWithHighlight(
+                "##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##"
+              )}
             </h3>
             <p className="text-gray-300 dark:text-gray-400 text-sm font-poppins leading-relaxed">
               {t("footer.powered")}
@@ -125,7 +118,7 @@ export default function Footer() {
               </p>
               <p className="text-gray-300 dark:text-gray-400 font-poppins">
                 ⏰ 24/7 Support
-              </p>    
+              </p>
             </div>
           </div>
         </div>
