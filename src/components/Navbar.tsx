@@ -120,8 +120,8 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
                 ? 'text-gray-800 dark:text-white' 
                 : 'text-gray-800 dark:text-white'
             }`}>
-              <span className="hidden sm:inline">TypoDetector</span>
-              <span className="sm:hidden">TypoDetector</span>
+              <span className="hidden sm:inline">TypoTrace</span>
+              <span className="sm:hidden">TypoTrace</span>
             </span>
           </Link>
 

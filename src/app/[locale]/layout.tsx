@@ -9,7 +9,7 @@ import { Providers } from "./providers";
 const locales = ["en", "id"];
 
 export const metadata: Metadata = {
-  title: "TypoDetector",
+  title: "TypoTrace",
   description: "Automatically detect typos in your thesis...",
   icons: { icon: "/favicon.svg" },
 };

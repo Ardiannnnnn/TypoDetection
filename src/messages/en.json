@@ -35,9 +35,9 @@
     "users": "Happy Users"
   },
   "about": {
-    "title": "About ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
-    "subtitle": "TypoDetector is an advanced AI application designed to help you detect and correct typos in your final project reports or theses, aiming to enhance the quality of your writing.",
-    "whyChoose": "Why We Created TypoDetector?",
+    "title": "About ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
+    "subtitle": "TypoTrace is an advanced AI application designed to help you detect and correct typos in your final project reports or theses, aiming to enhance the quality of your writing.",
+    "whyChoose": "Why We Created TypoTrace?",
     "features": {
       "aiTechnology": {
         "title": "Manual Proofreading is Time-Consuming",
@@ -55,13 +55,13 @@
     "mission": {
       "title": "Our Mission",
       "description": "We are committed to helping improve writing quality and communication by providing accurate, fast, and easy-to-use typo detection technology for everyone.",
-      "team": "TypoDetector Team",
+      "team": "TypoTrace Team",
       "role": "AI Research & Development",
       "quote": "Creating AI technology that can help everyone write better and more confidently."
     }
   },
   "howItWorks": {
-    "title": "How ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END## Works",
+    "title": "How ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END## Works",
     "subtitle": "Easy and fast typo detection process in 4 simple steps",
     "steps": {
       "upload": {
@@ -94,8 +94,8 @@
     "info": {
       "email": {
         "title": "Email",
-        "support": "support@typodetector.com",
-        "feedback": "feedback@typodetector.com"
+        "support": "support@TypoTrace.com",
+        "feedback": "feedback@TypoTrace.com"
       },
       "responseTime": {
         "title": "Response Time",
@@ -205,7 +205,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2025 TypoDetector. All rights reserved.",
+    "copyright": "© 2025 TypoTrace. All rights reserved.",
     "powered": "Powered by Advanced AI Technology for Accurate Typo Detection"
   }
 }

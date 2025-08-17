@@ -39,7 +39,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <h3 className="text-xl font-bold text-white dark:text-gray-100 mb-4 font-poppins">
-              {renderTextWithHighlight("##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##")}
+              {renderTextWithHighlight("##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##")}
             </h3>
             <p className="text-gray-300 dark:text-gray-400 text-sm font-poppins leading-relaxed">
               {t("footer.powered")}
@@ -118,14 +118,14 @@ export default function Footer() {
             </h4>
             <div className="space-y-2 text-sm">
               <p className="text-gray-300 dark:text-gray-400 font-poppins">
-                📧 support@typodetector.com
+                📧 support@TypoTrace.com
               </p>
               <p className="text-gray-300 dark:text-gray-400 font-poppins">
                 🌍 Indonesia
               </p>
               <p className="text-gray-300 dark:text-gray-400 font-poppins">
                 ⏰ 24/7 Support
-              </p>
+              </p>    
             </div>
           </div>
         </div>

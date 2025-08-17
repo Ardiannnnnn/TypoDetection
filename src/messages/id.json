@@ -35,9 +35,9 @@
     "users": "Pengguna Puas"
   },
   "about": {
-    "title": "Tentang ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
-    "subtitle": "TypoDetector adalah aplikasi AI canggih yang dirancang untuk membantu Anda mendeteksi dan memperbaiki kesalahan pengetikan dalam laporan tugas akhir atau skripsi anda, kami mengharapkan aplikasi ini dapat meningkatkan kualitas tulisan Anda.",
-    "whyChoose": "Mengapa Kami Membuat TypoDetector?",
+    "title": "Tentang ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
+    "subtitle": "TypoTrace adalah aplikasi AI canggih yang dirancang untuk membantu Anda mendeteksi dan memperbaiki kesalahan pengetikan dalam laporan tugas akhir atau skripsi anda, kami mengharapkan aplikasi ini dapat meningkatkan kualitas tulisan Anda.",
+    "whyChoose": "Mengapa Kami Membuat TypoTrace?",
     "features": {
       "aiTechnology": {
         "title": "Proofreading Manual Memakan Waktu",
@@ -55,13 +55,13 @@
     "mission": {
       "title": "Misi Kami",
       "description": "Kami berkomitmen untuk membantu meningkatkan kualitas tulisan dan komunikasi dengan menyediakan teknologi deteksi typo yang akurat, cepat, dan mudah digunakan untuk semua orang.",
-      "team": "Tim TypoDetector",
+      "team": "Tim TypoTrace",
       "role": "Penelitian & Pengembangan AI",
       "quote": "Membuat teknologi AI yang dapat membantu semua orang menulis dengan lebih baik dan percaya diri."
     }
   },
   "howItWorks": {
-    "title": "Cara Kerja ##HIGHLIGHT_START##TypoDetector##HIGHLIGHT_END##",
+    "title": "Cara Kerja ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
     "subtitle": "Proses deteksi typo yang mudah dan cepat dalam 4 langkah sederhana",
     "steps": {
       "upload": {
@@ -94,8 +94,8 @@
     "info": {
       "email": {
         "title": "Email",
-        "support": "support@typodetector.com",
-        "feedback": "feedback@typodetector.com"
+        "support": "support@TypoTrace.com",
+        "feedback": "feedback@TypoTrace.com"
       },
       "responseTime": {
         "title": "Response Time",
@@ -208,9 +208,8 @@
     }
   },
   "footer": {
-    "powered": "Didukung oleh AI TypoDetector.",
-    "copyright": "© TypoDetector. Semua hak cipta dilindungi.",
+    "powered": "Didukung oleh AI TypoTrace.",
+    "copyright": "© TypoTrace. Semua hak cipta dilindungi.",
     "allRightsReserved": "Seluruh hak cipta dilindungi."
   }
 }
-  
