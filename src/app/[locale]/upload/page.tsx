@@ -3,16 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Navbar from "@/components/Navbar";
-import { uploadFile } from "@/service/uploadService";
+import { uploadFile, fetchProgress, downloadResult } from "@/service/uploadService";
 import Loader from "@/components/loader";
-
-async function fetchProgress(jobId: string) {
-  const res = await fetch(
-    `https://periksa-laporan.jrycodes.me/progress/${jobId}`
-  );
-  if (!res.ok) throw new Error("Failed to fetch progress");
-  return res.json();
-}
 
 export default function UploadPage() {
   const t = useTranslations("upload");
@@ -55,7 +47,7 @@ export default function UploadPage() {
       setIsPolling(true);
       interval = setInterval(async () => {
         try {
-          const data = await fetchProgress(results.jobId);
+          const data = await fetchProgress(results.jobId); // Panggil dari service
           setProgressData(data);
           if (data.status === "completed" || data.status === "error") {
             setIsPolling(false);
@@ -70,23 +62,15 @@ export default function UploadPage() {
     return () => clearInterval(interval);
   }, [results?.jobId, results?.status]);
 
-  // Download result
+  // Download result (update penggunaan)
   const handleDownload = async () => {
     if (!results?.jobId) return;
-    const res = await fetch(
-      `https://periksa-laporan.jrycodes.me/download/${results.jobId}`
-    );
-    if (!res.ok) {
+    
+    try {
+      await downloadResult(results.jobId, results.fileName); // Panggil dari service
+    } catch (error) {
       alert("Download failed");
-      return;
     }
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = results.fileName || "result.pdf";
-    link.click();
-    window.URL.revokeObjectURL(url);
   };
 
   const resetUpload = () => {
