@@ -9,10 +9,41 @@ import { Providers } from "./providers";
 const locales = ["en", "id"];
 
 export const metadata: Metadata = {
-  title: "TypoTrace",
-  description: "Automatically detect typos in your thesis...",
+  title: "TypoTrace | Deteksi Typo Laporan & Skripsi Secara Otomatis",
+  description:
+    "TypoTrace membantu mendeteksi dan memperbaiki kesalahan penulisan (typo) pada laporan, skripsi, atau dokumen akademik Anda dengan cepat, otomatis, dan akurat.",
+  keywords: ["deteksi typo", "skripsi", "laporan", "cek tulisan otomatis", "typo checker Indonesia"],
   icons: { icon: "/favicon.svg" },
+  openGraph: {
+    title: "TypoTrace | Deteksi Typo Laporan & Skripsi",
+    description:
+      "Periksa laporan dan skripsi bebas typo secara otomatis dan akurat dengan TypoTrace.",
+    url: "https://typotrace.vercel.app",
+    siteName: "TypoTrace",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TypoTrace - Deteksi Typo Otomatis",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TypoTrace | Deteksi Typo Laporan & Skripsi",
+    description:
+      "Cek typo laporan dan skripsi dengan cepat dan otomatis.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
+
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
