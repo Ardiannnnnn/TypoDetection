@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Navbar from "@/components/Navbar";
 import { uploadFile } from "@/service/uploadService";
+import Loader from "@/components/loader";
 
 async function fetchProgress(jobId: string) {
   const res = await fetch(
@@ -151,11 +152,25 @@ export default function UploadPage() {
         </div>
         <div className="flex flex-col lg:flex-row justify-center items-center gap-8 w-full ">
           {/* Left: Upload Section */}
-          <div className="flex-1 w-full mx-auto lg:mx-0 bg">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-transparent dark:border-gray-700">
+          <div className="flex-1 w-full mx-auto lg:mx-0">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-transparent dark:border-gray-700 relative">
               <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center font-poppins">
                 {t("uploadSection.title")}
               </h2>
+              
+              {/* Loader Overlay - di depan konten */}
+              {(isProcessing || isPolling) && (
+                <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-50">
+                  <Loader />
+                  <div className="mt-4 text-lg font-semibold text-indigo-600 dark:text-indigo-400 font-poppins">
+                    {isPolling && progressData
+                      ? `Progress: ${progressData.progress ?? 0}%`
+                      : t("buttons.analyzing")}
+                  </div>
+                </div>
+              )}
+
+              {/* Konten upload tetap ada di bawah */}
               <div
                 className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors duration-200 cursor-pointer ${
                   isDragging
