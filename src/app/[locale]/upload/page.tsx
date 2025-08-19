@@ -331,15 +331,15 @@ export default function UploadPage() {
               ) : progressData?.status === "error" || !progressData?.result ? (
                 // --- Error state ---
                 <div className="flex flex-col items-center justify-center h-full">
-                  <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2 font-poppins">
+                  <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
                     {t("results.title")}
                   </h2>
-                  <p className="text-base text-red-500 dark:text-red-400 font-poppins mb-2">
+                  <p className="text-base text-green-500 dark:text-green-400 font-poppins mb-2">
                     {progressData?.message ||
                       "An error occurred during analysis."}
                   </p>
                   {progressData?.error && (
-                    <p className="text-sm text-red-400 dark:text-red-300 font-poppins">
+                    <p className="text-sm text-green-400 dark:green-red-300 font-poppins">
                       {progressData.error}
                     </p>
                   )}
@@ -347,11 +347,14 @@ export default function UploadPage() {
               ) : progressData?.status !== "completed" ? (
                 // --- Loading state ---
                 <div className="flex flex-col items-center justify-center h-full">
-                  <div className="w-8 h-8 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <span className="text-gray-700 dark:text-gray-200 font-poppins text-base">
+                  <div className="w-8 h-8 border-4 border-green-600 dark:border-green-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
+                    {t("results.title")}
+                  </h2>
+                  <span className="text-green-700 dark:text-green-200 font-poppins text-base">
                     {progressData?.message || "Processing..."}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-2 font-poppins">
+                  <span className="text-sm text-green-500 dark:text-green-400 mt-2 font-poppins">
                     {`Progress: ${progressData?.progress ?? 0}%`}
                   </span>
                 </div>
