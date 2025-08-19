@@ -41,15 +41,15 @@
     "features": {
       "aiTechnology": {
         "title": "Manual Proofreading is Time-Consuming",
-        "description": "Students often spend countless hours manually checking their thesis for typos, taking away valuable time from research and content improvement."
+        "description": "Students often spend hours manually checking for writing errors in their thesis, reducing time for research and development."
       },
       "security": {
         "title": "Human Eye Misses Hidden Errors",
-        "description": "After reading the same document repeatedly, students become blind to their own mistakes, missing critical typos that could affect their final grade."
+        "description": "Even after reading the same document repeatedly, students sometimes miss writing errors in their final project reports or thesis."
       },
       "easyToUse": {
         "title": "Limited Access to Professional Editors",
-        "description": "Not all students have access to professional proofreading services due to cost constraints, leaving them vulnerable to submission errors."
+        "description": "Not all students have access to professional proofreading services due to cost constraints, leaving them vulnerable to writing errors."
       }
     },
     "mission": {
