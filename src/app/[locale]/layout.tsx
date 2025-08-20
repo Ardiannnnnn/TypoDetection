@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import "../globals.css";
 import { poppins } from "../fonts";
-import Footer from "@/components/Footer"
+import Footer from "@/components/Footer";
 import { Providers } from "./providers";
 
 const locales = ["en", "id"];
@@ -34,8 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TypoTrace | Deteksi Typo Laporan & Skripsi",
-    description:
-      "Cek typo laporan dan skripsi dengan cepat dan otomatis.",
+    description: "Cek typo laporan dan skripsi dengan cepat dan otomatis.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -43,7 +42,6 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
-
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

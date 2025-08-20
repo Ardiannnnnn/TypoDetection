@@ -1,96 +1,112 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import Navbar from "@/components/Navbar";
-import { uploadFile, fetchProgress, downloadResult } from "@/service/uploadService";
+import {
+  uploadFile,
+  fetchProgress,
+  downloadResult,
+} from "@/service/uploadService";
 import Loader from "@/components/loader";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { UploadResponse, ProgressResponse } from "@/types/upload";
 
 export default function UploadPage() {
   const t = useTranslations("upload");
   const [file, setFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState<any>(null);
-  const [progressData, setProgressData] = useState<any>(null);
-  const [isPolling, setIsPolling] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Upload handler
-  const handleUpload = async () => {
-    if (!file) return;
-    setIsProcessing(true);
-    setProgressData(null);
-
-    try {
-      const data = await uploadFile(file);
+  // === Upload Mutation ===
+  const uploadMutation = useMutation({
+    mutationFn: uploadFile,
+    onSuccess: (data) => {
       setResults({
         fileName: data.original_filename,
         status: data.status,
         message: data.message,
         jobId: data.job_id,
       });
-    } catch (error) {
+    },
+    onError: () => {
       setResults({
         status: "error",
         message: "Failed to upload file. Please try again.",
       });
-    } finally {
-      setIsProcessing(false);
-    }
+    },
+  });
+
+  // === Progress Query ===
+  const { data: progressData, isFetching: isFetchingProgress } =
+    useQuery<ProgressResponse>({
+      queryKey: ["progress", results?.jobId],
+      queryFn: () => fetchProgress(results!.jobId),
+      enabled: !!results?.jobId && results?.status === "success",
+      refetchInterval: (query) => {
+        // Akses data dari query.state.data dengan proper typing
+        const data = query.state.data as ProgressResponse | undefined;
+        // Stop polling jika status completed atau error
+        if (data?.status === "completed" || data?.status === "error") {
+          return false;
+        }
+        return 1500; // polling tiap 1,5s
+      },
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: false,
+      retry: false, // Jangan retry jika gagal
+    });
+
+  // === Download Mutation ===
+  const downloadMutation = useMutation({
+    mutationFn: ({ jobId, fileName }: { jobId: string; fileName: string }) =>
+      downloadResult(jobId, fileName),
+    onError: () => {
+      alert("Download failed");
+    },
+  });
+
+  // === Computed States - PERBAIKAN ===
+  const isProcessing = uploadMutation.isPending;
+  const isAnalyzing =
+    results?.jobId &&
+    progressData?.status !== "completed" &&
+    progressData?.status !== "error";
+  const isLoading = isProcessing || isAnalyzing;
+
+  // === Handlers ===
+  const handleUpload = () => {
+    if (!file) return;
+    uploadMutation.mutate(file);
   };
 
-  // Polling progress after upload
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (results?.jobId && results.status === "success") {
-      setIsPolling(true);
-      interval = setInterval(async () => {
-        try {
-          const data = await fetchProgress(results.jobId); // Panggil dari service
-          setProgressData(data);
-          if (data.status === "completed" || data.status === "error") {
-            setIsPolling(false);
-            clearInterval(interval);
-          }
-        } catch {
-          setIsPolling(false);
-          clearInterval(interval);
-        }
-      }, 1500);
-    }
-    return () => clearInterval(interval);
-  }, [results?.jobId, results?.status]);
-
-  // Download result (update penggunaan)
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!results?.jobId) return;
-    
-    try {
-      await downloadResult(results.jobId, results.fileName); // Panggil dari service
-    } catch (error) {
-      alert("Download failed");
-    }
+    downloadMutation.mutate({
+      jobId: results.jobId,
+      fileName: results.fileName,
+    });
   };
 
   const resetUpload = () => {
     setFile(null);
     setResults(null);
-    setProgressData(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  // Drag & drop handlers
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
+
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -107,6 +123,7 @@ export default function UploadPage() {
       }
     }
   };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -134,20 +151,21 @@ export default function UploadPage() {
             {t("subtitle")}
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row justify-center items-center gap-8 w-full ">
+
+        <div className="flex flex-col lg:flex-row justify-center items-center gap-8 w-full">
           {/* Left: Upload Section */}
           <div className="flex-1 w-full mx-auto lg:mx-0">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-transparent dark:border-gray-700 relative">
               <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-center font-poppins">
                 {t("uploadSection.title")}
               </h2>
-              
-              {/* Loader Overlay - di depan konten */}
-              {(isProcessing || isPolling) && (
-                <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-50">
+
+              {/* Loader Overlay - PERBAIKAN */}
+              {isLoading && (
+                <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-10">
                   <Loader />
                   <div className="mt-4 text-lg font-semibold text-indigo-600 dark:text-indigo-400 font-poppins">
-                    {isPolling && progressData
+                    {isAnalyzing && progressData
                       ? `Progress: ${progressData.progress ?? 0}%`
                       : t("buttons.analyzing")}
                   </div>
@@ -166,7 +184,7 @@ export default function UploadPage() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => !isLoading && fileInputRef.current?.click()}
               >
                 <input
                   type="file"
@@ -174,6 +192,7 @@ export default function UploadPage() {
                   onChange={handleFileSelect}
                   accept=".pdf,application/pdf"
                   className="hidden"
+                  disabled={isLoading}
                 />
                 {file ? (
                   <div>
@@ -192,7 +211,6 @@ export default function UploadPage() {
                         />
                       </svg>
                     </div>
-
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 font-poppins break-all px-2">
                       {file.name}
                     </p>
@@ -230,57 +248,35 @@ export default function UploadPage() {
                   </div>
                 )}
               </div>
+
               <div className="flex flex-col gap-3 justify-center mt-6">
                 {file && (
                   <button
                     onClick={resetUpload}
-                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors font-poppins text-sm"
+                    disabled={isLoading}
+                    className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors font-poppins text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t("buttons.removeFile")}
                   </button>
                 )}
                 <button
                   onClick={handleUpload}
-                  disabled={!file || isProcessing || isPolling}
+                  disabled={!file || isLoading}
                   className={`w-full px-6 py-3 rounded-lg font-semibold text-sm transition-colors font-poppins relative overflow-hidden
-    ${
-      file && !isProcessing && !isPolling
-        ? "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 shadow-lg hover:shadow-xl"
-        : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-    }
-  `}
+                    ${
+                      file && !isLoading
+                        ? "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 shadow-lg hover:shadow-xl"
+                        : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    }
+                  `}
                 >
-                  {isProcessing || isPolling ? (
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-indigo-500 dark:border-t-indigo-400 rounded-full animate-spin"></div>
-                        <span>
-                          {isPolling && progressData
-                            ? `Analyzing... ${progressData.progress ?? 0}%`
-                            : t("buttons.analyzing")}
-                        </span>
-                      </div>
-                      {/* Progress bar */}
-                      {isPolling && progressData && (
-                        <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded mt-3 overflow-hidden">
-                          <div
-                            className="h-full bg-indigo-500 dark:bg-indigo-400 transition-all duration-300"
-                            style={{
-                              width: `${progressData.progress ?? 0}%`,
-                            }}
-                          ></div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    t("buttons.analyzeDesktop")
-                  )}
+                  {t("buttons.analyzeDesktop")}
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Right: Result Section */}
+          {/* Right: Result Section - PERBAIKAN */}
           <div className="flex-1 w-full mx-auto lg:mx-0">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-transparent dark:border-gray-700 min-h-[350px] flex flex-col justify-between">
               {/* Status & Result */}
@@ -293,7 +289,7 @@ export default function UploadPage() {
                   <p className="text-base text-gray-600 dark:text-gray-300 font-poppins mb-4">
                     {t("results.details.title")}
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-4">
+                  <div className="grid grid-cols-2 gap-4 w-full mt-4">
                     <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                       <div className="text-lg font-bold text-blue-600 dark:text-blue-400 font-poppins">
                         0
@@ -328,37 +324,23 @@ export default function UploadPage() {
                     </div>
                   </div>
                 </div>
-              ) : progressData?.status === "error" || !progressData?.result ? (
+              ) : progressData?.status === "error" ? (
                 // --- Error state ---
                 <div className="flex flex-col items-center justify-center h-full">
-                  <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
+                  <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2 font-poppins">
                     {t("results.title")}
                   </h2>
-                  <p className="text-base text-green-500 dark:text-green-400 font-poppins mb-2">
+                  <p className="text-base text-red-500 dark:text-red-400 font-poppins mb-2">
                     {progressData?.message ||
                       "An error occurred during analysis."}
                   </p>
                   {progressData?.error && (
-                    <p className="text-sm text-green-400 dark:green-red-300 font-poppins">
+                    <p className="text-sm text-red-400 dark:text-red-300 font-poppins">
                       {progressData.error}
                     </p>
                   )}
                 </div>
-              ) : progressData?.status !== "completed" ? (
-                // --- Loading state ---
-                <div className="flex flex-col items-center justify-center h-full">
-                  <div className="w-8 h-8 border-4 border-green-600 dark:border-green-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
-                    {t("results.title")}
-                  </h2>
-                  <span className="text-green-700 dark:text-green-200 font-poppins text-base">
-                    {progressData?.message || "Processing..."}
-                  </span>
-                  <span className="text-sm text-green-500 dark:text-green-400 mt-2 font-poppins">
-                    {`Progress: ${progressData?.progress ?? 0}%`}
-                  </span>
-                </div>
-              ) : (
+              ) : progressData?.status === "completed" ? (
                 // --- Analysis result ---
                 <div className="flex flex-col items-center justify-center h-full">
                   <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
@@ -402,6 +384,17 @@ export default function UploadPage() {
                     </div>
                   </div>
                 </div>
+              ) : (
+                // --- Loading state ---
+                <div className="flex flex-col items-center justify-center h-full">
+                  <div className="w-8 h-8 border-4 border-green-600 dark:border-green-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <h2 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2 font-poppins">
+                    {t("results.title")}
+                  </h2>
+                  <span className="text-green-700 dark:text-green-200 font-poppins text-base">
+                    {progressData?.message || "Processing..."}
+                  </span>
+                </div>
               )}
 
               {/* Download Button - always visible */}
@@ -409,12 +402,12 @@ export default function UploadPage() {
                 onClick={handleDownload}
                 disabled={progressData?.status !== "completed"}
                 className={`text-sm mt-8 w-full px-6 py-3 rounded-lg font-semibold transition-colors font-poppins
-    ${
-      progressData?.status === "completed"
-        ? "bg-green-600 dark:bg-green-500 text-white hover:bg-green-700 dark:hover:bg-green-600 shadow-lg hover:shadow-xl"
-        : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-    }
-  `}
+                  ${
+                    progressData?.status === "completed"
+                      ? "bg-green-600 dark:bg-green-500 text-white hover:bg-green-700 dark:hover:bg-green-600 shadow-lg hover:shadow-xl"
+                      : "bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
+                  }
+                `}
               >
                 {t("buttons.downloadResults")}
               </button>
