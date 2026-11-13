@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Nonsecret deployment template
+!.env.example
+
+# Local verification artifacts
+/test-results/
+/playwright-report/
