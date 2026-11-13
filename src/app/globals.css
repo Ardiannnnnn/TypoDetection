@@ -49,34 +49,48 @@ html {
   background: #a8a8a8;
 }
 
-/* Remove ALL focus outlines */
-*:focus {
-  outline: none !important;
+/* Accessible keyboard focus indicators (R-32) */
+:focus-visible {
+  outline: 2px solid #4338ca;
+  outline-offset: 2px;
 }
 
-button:focus {
-  outline: none !important;
+.dark :focus-visible {
+  outline-color: #818cf8;
 }
 
-a:focus {
-  outline: none !important;
+/* Interactive affordances (R-39) */
+a[href],
+button:not(:disabled),
+summary,
+select:not(:disabled),
+label[for],
+[role="button"]:not([aria-disabled="true"]),
+[role="tab"],
+[role="switch"] {
+  cursor: pointer;
 }
 
-input:focus {
-  outline: none !important;
+button:disabled,
+select:disabled,
+input:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
 }
 
-textarea:focus {
-  outline: none !important;
-}
-
-select:focus {
-  outline: none !important;
-}
-
-/* Remove focus ring for all elements */
-*:focus-visible {
-  outline: none !important;
+/* Respect reduced motion preferences (R-39) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ✅ Custom animations untuk dropdown */
