@@ -1,21 +1,17 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
 
 export default function About() {
   const t = useTranslations("about");
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
 
-  // ✅ Updated function with dark mode support
   const renderTextWithHighlight = (text: string) => {
     return text.split("##HIGHLIGHT_START##").map((part, index) => {
       if (index === 0) return part;
       const [highlighted, ...rest] = part.split("##HIGHLIGHT_END##");
       return (
         <span key={index}>
-          <span className="text-indigo-600 dark:text-indigo-400">
+          <span className="text-indigo-700 dark:text-indigo-400">
             {highlighted}
           </span>
           {rest.join("##HIGHLIGHT_END##")}
@@ -24,115 +20,96 @@ export default function About() {
     });
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.remove("opacity-0", "translate-y-8");
-            entry.target.classList.add("opacity-100", "translate-y-0");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    if (cardsRef.current) observer.observe(cardsRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section
       id="about"
-      className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-gray-900 transition-colors duration-300"
+      className="py-16 sm:py-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800"
     >
-      <div className="container mx-auto px-4 sm:px-6">
-        <div
-          ref={sectionRef}
-          className="text-center mb-8 sm:mb-12 lg:mb-16 opacity-0 translate-y-8 transition-all duration-1000 ease-out"
-        >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6 font-poppins">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+        <div className="max-w-3xl mb-12 sm:mb-14">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-4 font-poppins">
             {renderTextWithHighlight(t("title"))}
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed font-poppins px-4">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-poppins">
             {t("subtitle")}
           </p>
         </div>
 
-        <div
-          ref={cardsRef}
-          className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300"
-        >
-          {/* Left Content - Features */}
-          <div className="order-2 lg:order-1">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6 font-poppins">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          {/* Left Content - Pain Points */}
+          <div className="lg:col-span-7">
+            <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-6 font-poppins">
               {t("whyChoose")}
             </h3>
-            <div className="space-y-4 sm:space-y-6">
-              {/* AI Technology Feature */}
-              <div className="flex items-start space-x-3 sm:space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50">
+                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900 rounded-lg flex items-center justify-center shrink-0">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600 dark:text-indigo-400"
+                    className="w-5 h-5 text-indigo-700 dark:text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-50 mb-1.5 font-poppins">
                     {t("features.aiTechnology.title")}
                   </h4>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-poppins">
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-poppins">
                     {t("features.aiTechnology.description")}
                   </p>
                 </div>
               </div>
 
-              {/* Security Feature */}
-              <div className="flex items-start space-x-3 sm:space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50">
+                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900 rounded-lg flex items-center justify-center shrink-0">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400"
+                    className="w-5 h-5 text-indigo-700 dark:text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                     />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-50 mb-1.5 font-poppins">
                     {t("features.security.title")}
                   </h4>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-poppins">
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-poppins">
                     {t("features.security.description")}
                   </p>
                 </div>
               </div>
 
-              {/* Easy to Use Feature */}
-              <div className="flex items-start space-x-3 sm:space-x-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/50">
+                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900 rounded-lg flex items-center justify-center shrink-0">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400"
+                    className="w-5 h-5 text-indigo-700 dark:text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -143,10 +120,10 @@ export default function About() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white mb-2 font-poppins">
+                  <h4 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-50 mb-1.5 font-poppins">
                     {t("features.easyToUse.title")}
                   </h4>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-poppins">
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-poppins">
                     {t("features.easyToUse.description")}
                   </p>
                 </div>
@@ -155,33 +132,32 @@ export default function About() {
           </div>
 
           {/* Right Content - Mission & Team */}
-          <div className="order-1 lg:order-2 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-6 sm:p-8 rounded-2xl border border-transparent dark:border-gray-600 transition-colors duration-300">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6 font-poppins">
+          <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-950 p-6 sm:p-8 rounded-xl border border-slate-200 dark:border-slate-800">
+            <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-50 mb-4 font-poppins">
               {t("mission.title")}
             </h3>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 leading-relaxed font-poppins">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 mb-6 leading-relaxed font-poppins">
               {t("mission.description")}
             </p>
 
-            {/* Team Card */}
-            <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-xl shadow-sm dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-600">
-              <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-indigo-600 dark:bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm sm:text-xl font-poppins">
-                    TD
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-3.5 mb-4">
+                <div className="w-11 h-11 bg-indigo-700 dark:bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+                  <span className="text-white font-semibold text-sm font-poppins">
+                    TT
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-800 dark:text-white font-poppins text-sm sm:text-base">
+                  <h4 className="font-semibold text-slate-900 dark:text-slate-50 font-poppins text-sm sm:text-base">
                     {t("mission.team")}
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm font-poppins">
+                  <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm font-poppins">
                     {t("mission.role")}
                   </p>
                 </div>
               </div>
-              <blockquote className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm italic font-poppins border-l-4 border-indigo-500 dark:border-indigo-400 pl-4">
-                "{t("mission.quote")}"
+              <blockquote className="text-slate-600 dark:text-slate-300 text-sm italic font-poppins border-l-2 border-amber-500 pl-4">
+                &ldquo;{t("mission.quote")}&rdquo;
               </blockquote>
             </div>
           </div>

@@ -9,23 +9,35 @@
     "backToHome": "Kembali ke Beranda"
   },
   "hero": {
-    "title": "Deteksi ##HIGHLIGHT_START##Typo##HIGHLIGHT_END## dengan##BR##Presisi AI",
-    "subtitle": "Unggah dokumen Anda dan biarkan sistem AI canggih kami mengidentifikasi dan menyorot kesalahan ejaan, tata bahasa, dan typo dengan akurasi yang luar biasa.",
-    "uploadDocument": "Unggah Dokumen",
-    "learnMore": "Pelajari Lebih Lanjut"
+    "title": "Periksa ##HIGHLIGHT_START##Typo##HIGHLIGHT_END## Dokumen##BR##Sebelum Dikumpulkan",
+    "subtitle": "Unggah laporan tugas akhir atau skripsi dalam format PDF. TypoTrace menandai kesalahan ejaan dan pengetikan secara langsung beserta saran perbaikannya.",
+    "uploadDocument": "Unggah Dokumen PDF",
+    "learnMore": "Lihat Cara Kerja",
+    "supportedFormat": "Mendukung dokumen PDF hingga halaman laporan lengkap",
+    "preview": {
+      "fileName": "Bab_3_Metodologi_Penelitian.pdf",
+      "status": "2 kata perlu diperiksa",
+      "sampleBefore": "Pada tahap ",
+      "typoOne": "penelitain",
+      "fixOne": "penelitian",
+      "sampleMiddle": " ini, metode ",
+      "typoTwo": "analisa",
+      "fixTwo": "analisis",
+      "sampleAfter": " data dilakukan secara bertahap sesuai pedoman penulisan."
+    }
   },
   "features": {
     "aiPowered": {
-      "title": "Deteksi Bertenaga AI",
-      "description": "Algoritma machine learning canggih mendeteksi bahkan typo dan kesalahan tata bahasa yang paling halus."
+      "title": "Sorot Typo Langsung pada PDF",
+      "description": "Setiap kata yang salah ketik atau tidak baku ditandai jelas pada konteks kalimatnya, lengkap dengan saran perbaikan yang mudah ditinjau."
     },
     "lightningFast": {
-      "title": "Sangat Cepat",
-      "description": "Proses dokumen Anda dalam hitungan detik dengan mesin deteksi yang dioptimalkan."
+      "title": "Pemindaian Cepat per Halaman",
+      "description": "Periksa dokumen panjang dalam sekali unggah tanpa harus menyalin teks secara manual bab demi bab."
     },
     "secure": {
-      "title": "Aman & Privat",
-      "description": "Dokumen Anda diproses dengan aman dan tidak pernah disimpan di server kami."
+      "title": "Privasi Dokumen Terjaga",
+      "description": "Berkas Anda hanya diproses sementara untuk pemeriksaan ejaan dan tidak disimpan secara permanen di server."
     }
   },
   "stats": {

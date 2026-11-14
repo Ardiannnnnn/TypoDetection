@@ -9,23 +9,35 @@
     "backToHome": "Back to Home"
   },
   "hero": {
-    "title": "Detect ##HIGHLIGHT_START##Typos##HIGHLIGHT_END## with##BR##AI Precision",
-    "subtitle": "Upload your documents and let our advanced AI system identify and highlight spelling mistakes, grammar errors, and typos with incredible accuracy.",
-    "uploadDocument": "Upload Document",
-    "learnMore": "Learn More"
+    "title": "Catch Document ##HIGHLIGHT_START##Typos##HIGHLIGHT_END####BR##Before Submission",
+    "subtitle": "Upload your thesis or final report in PDF format. TypoTrace highlights spelling mistakes and typing errors directly in context with clear fix suggestions.",
+    "uploadDocument": "Upload PDF Document",
+    "learnMore": "See How It Works",
+    "supportedFormat": "Supports multi-page PDF reports and academic papers",
+    "preview": {
+      "fileName": "Chapter_3_Research_Methodology.pdf",
+      "status": "2 words to review",
+      "sampleBefore": "During this ",
+      "typoOne": "reasearch",
+      "fixOne": "research",
+      "sampleMiddle": " stage, the data ",
+      "typoTwo": "analsis",
+      "fixTwo": "analysis",
+      "sampleAfter": " is conducted step by step according to writing guidelines."
+    }
   },
   "features": {
     "aiPowered": {
-      "title": "AI-Powered Detection",
-      "description": "Advanced machine learning algorithms detect even the most subtle typos and grammatical errors."
+      "title": "Direct PDF Typo Highlighting",
+      "description": "Misspelled or non-standard words are clearly marked in sentence context alongside practical correction suggestions."
     },
     "lightningFast": {
-      "title": "Lightning Fast",
-      "description": "Process your documents in seconds with our optimized detection engine."
+      "title": "Fast Page-by-Page Scan",
+      "description": "Review lengthy documents in a single upload without copying and pasting text chapter by chapter."
     },
     "secure": {
-      "title": "Secure & Private",
-      "description": "Your documents are processed securely and never stored on our servers."
+      "title": "Private Document Handling",
+      "description": "Your files are processed temporarily for spelling checks and are never stored permanently on our servers."
     }
   },
   "stats": {

@@ -46,3 +46,7 @@ next-env.d.ts
 # Local verification artifacts
 /test-results/
 /playwright-report/
+
+# Upstream development-only files
+/anti-slop
+DESIGN.md
