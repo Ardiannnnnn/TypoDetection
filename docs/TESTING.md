@@ -37,10 +37,10 @@ boleh mengirim PDF ke hostname lama atau localhost production.
 | Mulai pemeriksaan | Request langsung ke backend, field multipart `file`, HTTP200 membawa `job_id`. |
 | Polling | Status queued/processing ditampilkan; completed100 hanya sesudah hasil tersedia. |
 | Selesai | Policy `usk-2024-v3`, sumber `evaluation-v3.0`, ringkasan dan temuan tersedia. |
-| Filter Typo/Italic/Tinjau | Daftar dan total mengikuti jenis yang dipilih. |
+| Ringkasan dan filter Ejaan/Miring/Tinjau | Daftar dan total mengikuti jenis yang dipilih. |
 | Cari kata/frasa | Pencarian dilakukan pada API sebelum pagination; query tidak melebihi160karakter. |
 | Pagination | Navigasi tidak melewati halaman pertama/terakhir; default20item. |
-| Pilih temuan | Preview atau tautan PDF membuka halaman sumber yang sesuai. |
+| Pilih temuan | Alasan tampil dan preview membuka halaman sumber. Mobile menggulir ke PDF. |
 | Download/report | Tautan menuju backend; PDF terbuka dan laporan HTML tersedia. |
 | Dokumen baru | State/filter/query/file lama direset tanpa menampilkan hasil job lain. |
 | Refresh tab | Job tersimpan dapat dilanjutkan pada origin backend yang sama. |
@@ -105,3 +105,19 @@ Gunakan format ringkas:
 Simpan screenshot, request/status yang relevan, serta halaman PDF yang ditinjau
 pada lokasi hasil lokal yang tidak dipush bila mengandung dokumen pribadi.
 Jangan menyertakan `.env`, token, isi CV atau data pribadi pada laporan publik.
+
+## Revisi ruang tinjau
+
+Home tidak memakai sidebar/footer penjelasan. Detail batas pemeriksaan dan
+versi tersedia melalui tombol bantuan. Ringkasan bisa difilter dengan klik;
+pencarian lama dibersihkan ketika ringkasan dipilih. Default Ditandai hanya
+memuat ejaan+italic; review diperiksa lewat Tinjau. Uji kontrol halaman PDF
+sebelumnya/berikutnya dan pilih temuan untuk kembali ke halaman target.
+
+## Beranda dan panduan
+
+Periksa `/id`, `/en` sebagai landing page, tombol Periksa PDF menuju /upload,
+serta /guide dan FAQ dengan keyboard Enter. Bahasa berpindah pada jenis halaman
+yang sama. Pastikan brand dari workspace kembali ke beranda; sesi pemeriksaan
+hanya dipulihkan saat kembali ke /upload. Sitemap sekarang enam URL canonical,
+bukan dua; /upload tidak lagi alias beranda.

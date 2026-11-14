@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
-import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Info, Search, Upload, X } from "lucide-react";
+import AppearanceToggle from "./AppearanceToggle";
+import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Search, Upload, X } from "lucide-react";
 import { API_BASE_URL, ApiError, apiUrl, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
 import type { CheckResult, FindingItem, FindingsResponse, ProgressResponse } from "@/types/upload";
 
@@ -45,6 +46,8 @@ export default function ReviewWorkspace() {
   const operation = useRef(0);
   const resultTitle = useRef<HTMLHeadingElement>(null);
   const errorTitle = useRef<HTMLHeadingElement>(null);
+  const previewPane = useRef<HTMLElement>(null);
+  const findingsTitle = useRef<HTMLHeadingElement>(null);
 
   function remember(value: SavedJob | null) {
     try {
@@ -205,63 +208,115 @@ export default function ReviewWorkspace() {
 
   function openGuide(event: React.MouseEvent<HTMLButtonElement>) { guideOpener.current = event.currentTarget; guide.current?.showModal(); }
   function closeGuide() { guide.current?.close(); guideOpener.current?.focus(); }
-  function chooseFinding(item: FindingItem) {
-    setSelected(item.finding_id || item.unit_id || "");
+  function chooseFinding(item: FindingItem, id: string) {
+    setSelected(id);
     setPdfPage(Number.isInteger(item.page) && item.page >= 1 && item.page <= (result?.total_pages || 1) ? item.page : 1);
+    if (window.matchMedia("(max-width: 900px)").matches) {
+      previewPane.current?.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    }
+  }
+
+  function changeView(value: string, fromSummary = false) {
+    setKind(value); setPage(1); setSelected("");
+    if (fromSummary) {
+      setQuery(""); setSearch("");
+      findingsTitle.current?.focus({ preventScroll: true });
+    }
   }
 
   const preview = job && result ? `${apiUrl(`/preview/${encodeURIComponent(job.id)}`)}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
   const summary = result?.evaluation;
   const total = findings?.total || 0;
   const pages = Math.max(1, Math.ceil(total / pageSize));
-  const labels: Record<string, string> = { spelling: say("Ejaan", "Spelling"), missing_italic: say("Belum italic", "Missing italic"), review: say("Perlu ditinjau", "Needs review") };
+  const labels: Record<string, string> = { spelling: say("Ejaan", "Spelling"), missing_italic: say("Belum miring", "Missing italics"), review: say("Perlu ditinjau", "Needs review") };
   const filename = job?.name || file?.name || "";
+
+  const categories = [
+    { type: "spelling", color: "red", symbol: "Aa", count: summary?.spelling_findings_count || 0, label: say("Ejaan", "Spelling") },
+    { type: "missing_italic", color: "blue", symbol: "a", count: summary?.italic_findings_count || 0, label: say("Belum miring", "Missing italics") },
+    { type: "review", color: "neutral", symbol: "?", count: summary?.review_count || 0, label: say("Perlu ditinjau", "Needs review") },
+  ];
 
   return <>
     <a className="skip-link" href="#main">{say("Lewati navigasi", "Skip navigation")}</a>
-    <aside className="sidebar" aria-label={say("Navigasi utama", "Main navigation")}>
-      <a className="brand" href={`/${locale}`} aria-label="TypoTrace"><FileText aria-hidden="true"/><span>TypoTrace<span className="brand-dot">.</span></span></a>
-      <p className="sidebar-description">{say("Ruang tinjau laporan", "Document review workspace")}</p>
-      <nav className="navigation"><a className="nav-item active" href={`/${locale}`} aria-current="page"><FileText/>{say("Pemeriksaan", "Review")}</a><button className="nav-item" onClick={openGuide}><CircleHelp/>{say("Cara membaca hasil", "Understanding findings")}</button></nav>
-      {filename && <div className="current-document"><span className="sidebar-label">{say("Dokumen saat ini", "Current document")}</span><div className="current-document-row"><span className="small-document" aria-hidden="true">PDF</span><span title={filename}>{filename}</span></div></div>}
-      <div className="sidebar-bottom"><span className="edition">{say("Versi eksperimen", "Experimental release")}</span><p>{say("Temuan adalah bantuan tinjau, bukan keputusan akhir.", "Findings support your review. They are not a final assessment.")}</p></div>
-    </aside>
-    <div className="app-shell">
-      <header className="toolbar"><span className="toolbar-title">{say("Pemeriksaan dokumen", "Document review")}</span><div className="toolbar-actions"><a className="locale-link" href={`/${english ? "id" : "en"}`} aria-label={say("Switch to English", "Ganti ke Bahasa Indonesia")}>{english ? "ID" : "EN"}</a>{panel !== "welcome" && panel !== "processing" && <button className="button quiet" onClick={reset}>{say("Dokumen baru", "New document")}</button>}<button className="help-button" onClick={openGuide} aria-label={say("Buka panduan", "Open review guide")}><CircleHelp/></button></div></header>
-      <main id="main" tabIndex={-1}>
-        {panel === "welcome" && <section className="welcome">
-          <div className="intro"><h1>{say("Periksa laporan Anda.", "A closer look at your report.")}</h1><p>{say("Temukan dugaan salah tulis dan bagian asing yang belum italic.", "Find possible spelling issues and foreign terms that need italics.")}<br className="desktop-break"/>{say(" Mulai dari PDF, lalu tinjau setiap temuan.", " Start with a PDF, then review each finding.")}</p></div>
-          {!isApiConfigured && <p className="service-notice" role="status">{say("Layanan pemeriksaan belum terhubung. Silakan kembali setelah layanan tersedia.", "The review service is not connected yet. Please return when the service is available.")}</p>}
-          <div className="intake-grid"><div className="upload-panel">
-            <div className={`dropzone${dragging ? " dragging" : ""}`} role="group" aria-label={say("Unggah dokumen PDF", "Upload a PDF")}
-              onDragOver={(event) => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); const files=event.dataTransfer.files; if (files.length>1) setFileError(say("Pilih satu PDF untuk setiap pemeriksaan.", "Choose one PDF per review.")); else if (files[0] && isApiConfigured) selectFile(files[0]); }}>
-              <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!isApiConfigured || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={(event) => { if(event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
-              {file ? <div className="file-selection"><span className="file-icon" aria-hidden="true">PDF</span><h2>{file.name}</h2><p>{number(Math.max(1,Math.round(file.size/1024)))} KB</p><button className="text-button" disabled={busy} onClick={() => fileInput.current?.click()}>{say("Ganti dokumen", "Choose another file")}</button></div>
-                : <div className="drop-prompt"><div className="upload-symbol"><Upload/></div><h2>{say("Satu PDF untuk mulai.", "One PDF to get started.")}</h2><p>{say("Seret dokumen ke sini, atau pilih dari perangkat Anda.", "Drop your document here, or choose one from your device.")}</p><button className="button secondary" disabled={!isApiConfigured || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}</button><span className="file-hint">{say("Maksimum 50 MB. PDF dengan teks.", "Up to 50 MB. PDFs with selectable text.")}</span></div>}
+    <header className="toolbar">
+      <a className="brand" href={`/${locale}`} aria-label="TypoTrace"><FileText aria-hidden="true"/><span>TypoTrace</span></a>
+      <div className="toolbar-actions">
+        <AppearanceToggle english={english}/>
+        <a className="locale-link" href={`/${english ? "id" : "en"}/upload`} aria-label={say("Switch to English", "Ganti ke Bahasa Indonesia")}>{english ? "ID" : "EN"}</a>
+        <button className="help-button" onClick={openGuide} aria-label={say("Buka panduan", "Open review guide")}><CircleHelp/></button>
+        {panel !== "welcome" && panel !== "processing" && <button className="button secondary new-document" onClick={reset}>{say("PDF baru", "New PDF")}</button>}
+      </div>
+    </header>
+    <main id="main" className={`page page-${panel}`} tabIndex={-1}>
+      {panel === "welcome" && <section className="welcome">
+        <div className="intro"><h1>{say("Periksa laporan Anda.", "Review your report.")}</h1><p>{say("Temukan dugaan salah ejaan dan istilah yang belum miring.", "Find possible spelling issues and terms that need italics.")}</p></div>
+        {!isApiConfigured && <p className="service-notice" role="status">{say("Layanan pemeriksaan belum terhubung.", "The review service is not connected yet.")}</p>}
+        <div className="upload-panel">
+          <div className={`dropzone${dragging ? " dragging" : ""}`} role="group" aria-label={say("Unggah dokumen PDF", "Upload a PDF")}
+            onDragOver={event => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
+            onDrop={event => { event.preventDefault(); setDragging(false); const files = event.dataTransfer.files; if (files.length > 1) setFileError(say("Pilih satu PDF untuk setiap pemeriksaan.", "Choose one PDF per review.")); else if (files[0] && isApiConfigured) selectFile(files[0]); }}>
+            <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!isApiConfigured || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={event => { if (event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
+            {file ? <div className="file-selection"><FileText className="document-icon" aria-hidden="true"/><h2>{file.name}</h2><p>{number(Math.max(1, Math.round(file.size / 1024)))} KB</p><button className="text-button" disabled={busy} onClick={() => fileInput.current?.click()}>{say("Ganti PDF", "Choose another PDF")}</button></div>
+              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!isApiConfigured || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 50 MB", "Text-based PDF · Up to 50 MB")}</p></div>}
+          </div>
+          {fileError && <p className="inline-error" role="alert">{fileError}</p>}
+          {file && <button className="button primary start-button" disabled={busy || !isApiConfigured} onClick={() => startUpload(file)}>{say("Periksa PDF", "Review PDF")}<ArrowRight/></button>}
+        </div>
+        <button className="example-button" disabled={busy || !isApiConfigured} onClick={tryExample}>{busy ? say("Menyiapkan contoh…", "Preparing sample…") : say("Coba dengan PDF contoh", "Try a sample PDF")}</button>
+      </section>}
+
+      {panel === "processing" && <section className="processing-panel" aria-labelledby="processingTitle">
+        <span className="spinner" aria-hidden="true"/>
+        <h1 id="processingTitle">{job ? say("Memeriksa PDF…", "Reviewing your PDF…") : say("Mengunggah PDF…", "Uploading your PDF…")}</h1>
+        <p className="processing-filename">{filename}</p>
+        <div className="progress-wrap"><progress max={100} value={job ? Math.min(100, Math.max(0, progress?.progress || 0)) : undefined} aria-label={say("Progres pemeriksaan", "Review progress")}/><span>{job ? `${Math.round(progress?.progress || 0)}%` : ""}</span></div>
+        <p id="processingMessage" role="status" aria-live="polite">{connectionNote || progress?.message || say("Menyiapkan halaman…", "Preparing pages…")}</p>
+      </section>}
+
+      {panel === "error" && failure && <section className="error-panel"><span className="error-symbol" aria-hidden="true">!</span><h1 ref={errorTitle} tabIndex={-1}>{failure.title}</h1><p role="alert">{failure.message}</p><div className="error-actions">{failure.retry && <button className="button primary" onClick={() => { setConnectionNote(""); setRetry(v => v + 1); setPanel("processing"); }}>{say("Cek status lagi", "Check status again")}</button>}<button className="button secondary" onClick={reset}>{say("Pilih PDF lain", "Choose another PDF")}</button></div></section>}
+
+      {panel === "results" && job && result && <section className="results" aria-labelledby="resultTitle">
+        <div className="result-heading"><div><div className="completed-label"><Check aria-hidden="true"/>{say("Selesai diperiksa", "Review complete")}</div><h1 id="resultTitle" ref={resultTitle} tabIndex={-1}>{filename}</h1><p>{number(result.total_pages)} {say("halaman", "pages")}</p></div><div className="result-actions"><a className="button secondary" href={apiUrl(`/report/${encodeURIComponent(job.id)}`)} target="_blank" rel="noopener">{say("Laporan lengkap", "Full report")}</a><a className="button primary" href={apiUrl(`/download/${encodeURIComponent(job.id)}`)}><ArrowDownToLine/>{say("Unduh PDF", "Download PDF")}</a></div></div>
+        <div className="summary-strip" role="group" aria-label={say("Pilih jenis temuan", "Choose finding type")}>
+          {categories.map(category => <button key={category.type} className={`summary-card ${category.color}`} aria-pressed={kind === category.type} onClick={() => changeView(category.type, true)}><span className={`summary-symbol ${category.color}`} aria-hidden="true">{category.symbol}</span><strong>{number(category.count)}</strong><span className="summary-label">{category.label}</span><ChevronRight aria-hidden="true"/></button>)}
+        </div>
+        {!!result.coverage?.unreadable_pages && <p className="coverage-note">{number(result.coverage.unreadable_pages)} {say("halaman tidak memiliki teks yang dapat dibaca dan belum diperiksa.", "pages have no readable text and could not be reviewed.")}</p>}
+        <div className="review-workspace">
+          <section ref={previewPane} className="preview-pane" aria-labelledby="previewHeading">
+            <div className="pane-title"><h2 id="previewHeading">{say("PDF hasil", "Reviewed PDF")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div>
+            <div className="preview-canvas"><iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/></div>
+            <div className="pdf-pagination"><button className="icon-button" disabled={pdfPage <= 1} onClick={() => setPdfPage(p => Math.max(1, p - 1))} aria-label={say("Halaman PDF sebelumnya", "Previous PDF page")}><ChevronLeft/></button><span>{say("Halaman", "Page")} {pdfPage} / {result.total_pages}</span><button className="icon-button" disabled={pdfPage >= result.total_pages} onClick={() => setPdfPage(p => Math.min(result.total_pages, p + 1))} aria-label={say("Halaman PDF berikutnya", "Next PDF page")}><ChevronRight/></button></div>
+          </section>
+          <section className="findings-pane" aria-labelledby="findingsHeading">
+            <div className="pane-title"><h2 id="findingsHeading" ref={findingsTitle} tabIndex={-1}>{say("Temuan", "Findings")}</h2><span>{listLoading ? "…" : number(total)}</span></div>
+            <div className="filters" role="group" aria-label={say("Jenis temuan", "Finding type")}>{[["", say("Ditandai", "Highlighted")], ["spelling", say("Ejaan", "Spelling")], ["missing_italic", say("Miring", "Italics")], ["review", say("Tinjau", "Review")]].map(([value, label]) => <button key={value} className={`filter${kind === value ? " active" : ""}`} aria-pressed={kind === value} onClick={() => changeView(value)}>{label}</button>)}</div>
+            <label className="search"><Search aria-hidden="true"/><input type="search" value={query} maxLength={160} onChange={event => setQuery(event.target.value)} placeholder={say("Cari kata…", "Find a word…")} aria-label={say("Cari pada seluruh temuan", "Search all findings")}/></label>
+            <p className="list-status" role="status" aria-live="polite">{listLoading ? say("Memuat…", "Loading…") : listError || (search ? `${number(total)} ${say("hasil", "results")}` : "")}</p>
+            <div className="findings-list" aria-busy={listLoading}>
+              {!listError && findings?.items.map((item, index) => {
+                const id = item.finding_id || item.unit_id || `${item.page}-${index}`;
+                const type = item.type || "review";
+                return <button key={id} className="finding" data-type={type} aria-pressed={selected === id} onClick={() => chooseFinding(item, id)}>
+                  <span className="finding-top"><span className="finding-target">{item.target || say("Bagian dokumen", "Document section")}</span><span className="finding-page">{say("Hlm.", "Pg.")} {item.page}<ChevronRight aria-hidden="true"/></span></span>
+                  <span className="finding-kind">{labels[type] || labels.review}</span>
+                  {selected === id && <span className="finding-message">{item.message || item.review_reasons?.join(" ") || say("Periksa bagian ini dalam konteks kalimatnya.", "Check this part in the context of its sentence.")}</span>}
+                </button>;
+              })}
+              {!listLoading && !listError && !findings?.items.length && <div className="empty-list"><Search aria-hidden="true"/><strong>{search ? say("Tidak ditemukan", "No matches") : say("Tidak ada temuan di kategori ini", "No findings in this category")}</strong>{search && <button className="text-button" onClick={() => setQuery("")}>{say("Hapus pencarian", "Clear search")}</button>}</div>}
+              {listError && <div className="empty-list"><button className="button secondary" onClick={() => setListRetry(v => v + 1)}>{say("Coba lagi", "Try again")}</button></div>}
             </div>
-            {fileError && <p className="inline-error" role="alert">{fileError}</p>}
-            <button className="button primary start-button" disabled={!file || busy || !isApiConfigured} onClick={() => file && startUpload(file)}>{say("Periksa dokumen", "Review document")}<ArrowRight/></button>
-            <button className="example-button" disabled={busy || !isApiConfigured} onClick={tryExample}><FileText/>{busy ? say("Menyiapkan contoh…", "Preparing sample…") : say("Coba dokumen contoh", "Try a sample document")}</button>
-          </div><figure className="paper-scene" aria-label={say("Contoh penandaan merah dan biru", "Example red and blue annotations")}><div className="paper-shadow"/><div className="example-paper"><div className="paper-running-head">{say("Laporan penelitian", "Research report")}</div><h3>Metode Penelitian</h3><p>Penelitian ini membahas pengembangan sistem untuk membantu proses peninjauan laporan.</p><p>Tahap <mark className="typo-mark">impelementasi</mark> dilakukan setelah kebutuhan sistem ditentukan.</p><p>Analisis data menggunakan pendekatan <mark className="italic-mark">machine learning</mark> untuk mendukung penelitian.</p><div className="paper-rule"/><div className="paper-page">12</div></div><figcaption>{say("Contoh penandaan, bukan hasil dokumen Anda.", "Illustration only, not the result of your document.")}</figcaption></figure></div>
-          <div className="legend-line"><span><i className="legend-dot red"/>{say("Dugaan salah tulis", "Possible spelling issue")}</span><span><i className="legend-dot blue"/>{say("Bagian belum italic", "Missing italics")}</span><span><i className="legend-dot gray"/>{say("Belum jelas, perlu ditinjau", "Uncertain, needs review")}</span></div>
-        </section>}
-
-        {panel === "processing" && <section className="processing-panel" aria-labelledby="processingTitle"><div className="processing-icon" aria-hidden="true"><span className="spinner"/></div><h1 id="processingTitle">{job ? say("Memeriksa dokumen…", "Reviewing your document…") : say("Mengunggah dokumen…", "Uploading your document…")}</h1><p className="processing-filename">{filename}</p><div className="progress-wrap"><progress max={100} value={job ? Math.min(100,Math.max(0,progress?.progress || 0)) : undefined} aria-label={say("Progres pemeriksaan", "Review progress")}/><span>{job ? `${Math.round(progress?.progress || 0)}%` : ""}</span></div><p id="processingMessage" role="status" aria-live="polite">{connectionNote || progress?.message || say("Menyiapkan PDF untuk pemeriksaan.", "Preparing the PDF for review.")}</p><span className="secondary-text">{progress?.total_pages ? `${say("Halaman", "Page")} ${number(progress.current_page || 0)} / ${number(progress.total_pages)}` : say("Menyiapkan halaman dokumen.", "Preparing document pages.")}</span><p className="processing-note">{say("Dokumen asli tetap utuh. Hasil dibuat sebagai salinan.", "The original stays unchanged. Results are saved as a separate copy.")}</p></section>}
-
-        {panel === "error" && failure && <section className="error-panel"><span className="error-symbol" aria-hidden="true">!</span><h1 ref={errorTitle} tabIndex={-1}>{failure.title}</h1><p role="alert">{failure.message}</p><div className="error-actions">{failure.retry && <button className="button primary" onClick={() => { setConnectionNote(""); setRetry(v=>v+1); setPanel("processing"); }}>{say("Cek status lagi", "Check status again")}</button>}<button className="button secondary" onClick={reset}>{say("Pilih PDF lain", "Choose another PDF")}</button></div></section>}
-
-        {panel === "results" && job && result && <section className="results" aria-labelledby="resultTitle"><div className="result-heading"><div><div className="completed-label"><Check/>{say("Pemeriksaan selesai", "Review complete")}</div><h1 id="resultTitle" ref={resultTitle} tabIndex={-1}>{filename}</h1><p>{number(result.total_pages)} {say("halaman", "pages")}, {number(result.total_words)} {say("kata dibaca", "words read")}</p></div><div className="result-actions"><a className="button secondary" href={apiUrl(`/report/${encodeURIComponent(job.id)}`)} target="_blank" rel="noopener">{say("Buka laporan", "Open report")}</a><a className="button primary" href={apiUrl(`/download/${encodeURIComponent(job.id)}`)}><ArrowDownToLine/>{say("Unduh PDF", "Download PDF")}</a></div></div>
-          <div className="summary-strip" aria-label={say("Ringkasan temuan", "Findings summary")}>{[["red","Aa",summary?.spelling_findings_count || 0,say("Dugaan typo","Spelling issues")],["blue","a",summary?.italic_findings_count || 0,say("Belum italic","Missing italics")],["neutral","?",summary?.review_count || 0,say("Perlu ditinjau","Needs review")]].map(([color,symbol,count,label])=><div key={String(color)}><span className={`summary-symbol ${color}`}>{symbol}</span><div><strong>{number(Number(count))}</strong><span>{label}</span></div></div>)}</div>
-          {!!result.coverage?.unreadable_pages && <p className="coverage-note">{number(result.coverage.unreadable_pages)} {say("halaman tidak memiliki teks yang dapat dibaca dan belum diperiksa.", "pages have no readable text and could not be reviewed.")}</p>}
-          <div className="review-workspace"><section className="findings-pane" aria-labelledby="findingsHeading"><div className="pane-title"><h2 id="findingsHeading">{say("Temuan", "Findings")}</h2><span>{number(total)} {say("bagian", "items")}</span></div><div className="filters" role="group" aria-label={say("Jenis temuan", "Finding type")}>{[["",say("Semua","All")],["spelling",say("Typo","Spelling")],["missing_italic","Italic"],["review",say("Tinjau","Review")]].map(([value,label])=><button key={value} className={`filter${kind===value?" active":""}`} aria-pressed={kind===value} onClick={()=>{setKind(value);setPage(1);}}>{label}</button>)}</div><label className="search"><Search/><input type="search" value={query} maxLength={160} onChange={event=>setQuery(event.target.value)} placeholder={say("Cari kata atau frasa", "Find a word or phrase")} aria-label={say("Cari pada seluruh temuan", "Search all findings")}/></label><p className="list-status" role="status" aria-live="polite">{listLoading ? say("Memuat temuan…","Loading findings…") : listError || (search ? `${number(total)} ${say("hasil pencarian.","search results.")}` : "")}</p>
-            <div className="findings-list" aria-busy={listLoading}>{!listError && findings?.items.map((item,index)=>{const id=item.finding_id||item.unit_id||`${item.page}-${index}`; const type=item.type||"review";return <button key={id} className="finding" data-type={type} aria-pressed={selected===id} onClick={()=>chooseFinding(item)}><span className="finding-top"><span className="finding-target">{item.target || say("Bagian dokumen","Document section")}</span><span className="finding-page">{say("Hlm.","Pg.")} {item.page}</span></span><span className="finding-kind">{labels[type]||labels.review}</span><p className="finding-message">{item.message || item.review_reasons?.join(" ") || say("Tinjau bagian ini pada dokumen.","Review this section in your document.")}</p></button>;})}{!listLoading && !listError && !findings?.items.length && <div className="empty-list"><strong>{search ? say("Belum ada yang cocok.","No matching findings.") : say("Tidak ada temuan pada pilihan ini.","No findings in this view.")}</strong><p>{search ? say("Coba kata lain atau hapus pencarian.","Try another word or clear the search.") : say("Tidak adanya highlight bukan jaminan semua tulisan benar.","No highlights does not guarantee that all writing is correct.")}</p></div>}{listError && <div className="empty-list"><p>{listError}</p><button className="button secondary list-retry" onClick={()=>setListRetry(v=>v+1)}>{say("Muat ulang daftar","Retry findings")}</button></div>}</div>
-            <div className="pagination"><button className="icon-button" disabled={page<=1||listLoading} aria-label={say("Halaman sebelumnya","Previous findings page")} onClick={()=>setPage(p=>Math.max(1,p-1))}><ChevronLeft/></button><span>{page} {say("dari","of")} {pages}</span><button className="icon-button" disabled={page>=pages||listLoading} aria-label={say("Halaman berikutnya","Next findings page")} onClick={()=>setPage(p=>p+1)}><ChevronRight/></button></div></section>
-            <section className="preview-pane" aria-labelledby="previewHeading"><div className="pane-title"><h2 id="previewHeading">{say("PDF hasil", "Reviewed PDF")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div><div className="preview-canvas"><iframe src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/></div><p className="preview-note">{say("Pilih temuan untuk membuka halamannya. Jika pratinjau tidak tampil, gunakan Buka PDF.", "Select a finding to open its page. If the preview is unavailable, use Open PDF.")}</p></section></div>
-          <details className="diagnostics"><summary>{say("Detail pemeriksaan", "Review details")}</summary><dl>{[[say("Versi kebijakan","Policy version"),result.policy_version],[say("Sumber kata","Word resources"),result.resource_version],[say("Jumlah anotasi PDF","PDF annotations"),summary?.annotation_count ?? 0]].map(([label,value])=><div className="detail-row" key={String(label)}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></details>
-        </section>}
-        <footer className="workspace-footer"><Info/><p>{say("Alat bantu peninjauan. Temuan otomatis masih perlu diperiksa penulis.", "A review aid. The author should check all automated findings.")}</p></footer>
-      </main>
-    </div>
-    <dialog ref={guide} aria-labelledby="guideTitle" onCancel={event=>{event.preventDefault();closeGuide();}}><div className="dialog-heading"><h2 id="guideTitle">{say("Cara membaca hasil", "Understanding findings")}</h2><button className="icon-button" onClick={closeGuide} aria-label={say("Tutup panduan", "Close guide")}><X/></button></div><p>{say("Mulai dari highlight, lalu cocokkan dengan konteks kalimat di PDF.", "Start with the highlight, then check the sentence in your PDF.")}</p>{[["red","Aa",say("Dugaan typo","Possible spelling issue"),say("Penulisan yang mungkin salah berdasarkan sumber dan aturan. Periksa saran sebelum mengubahnya.","A possible writing issue supported by available resources and rules. Check suggestions before changing it.")],["blue","a",say("Belum italic","Missing italics"),say("Bagian asing yang perlu italic, tetapi font terbaca normal. Nama diri memiliki pengecualian.","A foreign term needs italics, but its font is normal. Proper names have exceptions.")],["neutral","?",say("Perlu ditinjau","Needs review"),say("Bukti bahasa atau format belum cukup. Kata tidak dikenal bukan otomatis salah.","The language or formatting evidence is insufficient. An unknown word is not automatically wrong.")]].map(([color,symbol,title,description])=><div className="guide-row" key={color}><span className={`summary-symbol ${color}`}>{symbol}</span><div><h3>{title}</h3><p>{description}</p></div></div>)}<div className="guide-note">{say("Versi eksperimen dengan cakupan kosakata terbatas. Tidak ada highlight bukan jaminan teks sudah benar. PDF scan belum didukung.", "This experimental release has limited vocabulary coverage. No highlights does not guarantee correct text. Scanned PDFs are not supported.")}</div><button className="button primary" onClick={closeGuide}>{say("Mengerti", "Understood")}</button></dialog>
+            <div className="pagination"><button className="icon-button" disabled={page <= 1 || listLoading} aria-label={say("Halaman temuan sebelumnya", "Previous findings page")} onClick={() => setPage(p => Math.max(1, p - 1))}><ChevronLeft/></button><span>{page} / {pages}</span><button className="icon-button" disabled={page >= pages || listLoading} aria-label={say("Halaman temuan berikutnya", "Next findings page")} onClick={() => setPage(p => p + 1)}><ChevronRight/></button></div>
+          </section>
+        </div>
+      </section>}
+    </main>
+    <dialog ref={guide} aria-labelledby="guideTitle" onCancel={event => { event.preventDefault(); closeGuide(); }}>
+      <div className="dialog-heading"><h2 id="guideTitle">{say("Membaca hasil pemeriksaan", "Understanding your results")}</h2><button className="icon-button" onClick={closeGuide} aria-label={say("Tutup panduan", "Close guide")}><X/></button></div>
+      {[["red", "Aa", say("Ejaan", "Spelling"), say("Kandidat salah tulis ditandai merah. Klik temuan, cocokkan dengan kalimatnya, lalu perbaiki di dokumen sumber bila sesuai.", "Possible spelling issues are highlighted red. Select a finding, check its sentence, then edit your source document if appropriate.")], ["blue", "a", say("Belum miring", "Missing italics"), say("Istilah yang diduga perlu huruf miring ditandai biru. Periksa konteksnya sebelum mengubah format.", "Terms that may need italics are highlighted blue. Check their context before changing formatting.")], ["neutral", "?", say("Perlu ditinjau", "Needs review"), say("Buktinya belum cukup. Bagian ini tidak ditandai merah atau biru; kata tidak dikenal belum tentu salah.", "Evidence is insufficient. These parts are not highlighted red or blue; unfamiliar words are not necessarily wrong.")]].map(([color, symbol, title, description]) => <div className="guide-row" key={color}><span className={`summary-symbol ${color}`} aria-hidden="true">{symbol}</span><div><h3>{title}</h3><p>{description}</p></div></div>)}
+      <div className="guide-note">{say("Pemeriksaan masih terbatas dan belum mendukung PDF scan. Hasil tanpa temuan tidak menjamin seluruh tulisan sudah benar. PDF asli tetap utuh; hasilnya berupa salinan.", "The review has limited coverage and does not support scanned PDFs. No findings does not guarantee correct writing. Your original PDF stays unchanged; results are saved as a copy.")}</div>
+      {result && <dl className="review-details"><div><dt>{say("Kebijakan", "Policy")}</dt><dd>{result.policy_version}</dd></div><div><dt>{say("Sumber", "Resources")}</dt><dd>{result.resource_version}</dd></div></dl>}
+      <button className="button primary" onClick={closeGuide}>{say("Mengerti", "Understood")}</button>
+    </dialog>
   </>;
 }

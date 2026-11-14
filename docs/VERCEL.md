@@ -3,19 +3,16 @@
 Target: frontend ini di Vercel, backend v3 di Application Dokploy baru.
 Backend sudah disiapkan pada `Papazy/periksaLaporan`, branch `main`.
 Target backend: **`https://api-typotrace.jry.codes`**, belum dideploy.
+Target frontend: **`https://typotrace.jry.codes`**. Konfigurasi DNS, SEO dan
+tema ada di [DESIGN-SEO.md](DESIGN-SEO.md). Fokus sekarang tetap penggunaan lokal.
 Pengguna mengurus Dokploy/DNS; agen menyiapkan source dan Docker backend.
 
-## 1. Merge clone frontend ke repo Ardian
+## 1. Review dan merge PR ke main
 
-Clone lokal berasal dari `Ardiannnnnn/TypoDetection`, dengan riwayat dan atribusi
-asal dipertahankan. Sesuai arahan pengguna, perubahan disiapkan di clone ini;
-pengguna akan merge ke repo Ardian. Repo privat baru tidak diperlukan.
-Akun agen hanya punya akses baca dan push upstream dinonaktifkan.
-
-Review diff dan berkas baru, lalu commit perubahan frontend. Pengguna dapat
-memindahkan commit lewat branch/fork atau patch dan merge ke repo asal memakai
-akun yang berwenang. Jangan memasukkan .env.local, node_modules, .next atau
-hasil pengujian. Tidak perlu menghapus situs Vercel lama.
+Perubahan frontend diajukan lewat branch pada `Ardiannnnnn/TypoDetection`,
+dengan base PR `main`. Review diff dan bukti testing sebelum merge. Tidak
+memerlukan fork atau repo privat baru. Jangan menyertakan .env.local,
+node_modules, .next atau hasil unggahan pengguna pada commit.
 
 ## 2. Deploy backend dahulu
 
@@ -65,6 +62,7 @@ mengirim dokumen ke backend lama atau otomatis ke localhost pengguna.
 
 Frontend dan backend merupakan origin berbeda. Backend saat ini mengizinkan:
 
+- `https://typotrace.jry.codes` (perlu source/config CORS backend terbaru)
 - `https://typo-detection.vercel.app`
 - `http://localhost:3000`
 - `http://127.0.0.1:3000`

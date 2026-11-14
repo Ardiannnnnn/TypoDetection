@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://typotrace.vercel.app/sitemap.xml

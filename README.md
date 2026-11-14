@@ -10,19 +10,13 @@ itu bukan bukti bahwa kata tersebut salah. Aplikasi belum menjadi grammar
 checker umum, kamus lengkap, atau penilaian bahasa yang pasti. PDF hasil dan
 laporan disimpan oleh backend sesuai konfigurasi penyimpanannya.
 
-## Status salinan ini
+## Status pengembangan
 
-Source asal: [Ardiannnnnn/TypoDetection](https://github.com/Ardiannnnnn/TypoDetection),
-frontend situs `typo-detection.vercel.app`, dibuat oleh
-[Ardian](https://github.com/Ardiannnnnn). Akun `Papazy` mempunyai akses baca,
-tetapi tidak mempunyai akses push/admin pada repo asal. Clone lokal dapat ditempatkan di folder `TypoDetection` di samping repo backend.
-
-Perubahan disiapkan lokal untuk frontend yang terhubung ke backend v3.
-**Perubahan disiapkan pada clone ini untuk di-merge pengguna ke repo Ardian;
-belum dideploy ke Vercel.**
-Jangan menganggap perubahan lokal sudah memperbarui situs asal. Riwayat Git
-asal dipertahankan; dokumentasi ini tidak menambahkan klaim lisensi yang belum
-tersedia pada berkas source.
+Dikembangkan dari [Ardiannnnnn/TypoDetection](https://github.com/Ardiannnnnn/TypoDetection),
+karya [Ardian](https://github.com/Ardiannnnnn). Perubahan frontend diajukan melalui
+branch dan PR ke `main` di repository yang sama. Riwayat dan atribusi source
+asal dipertahankan. Source ini belum berarti situs Vercel sudah diperbarui;
+konfigurasi backend dan deployment tetap perlu disiapkan.
 
 ## Pembagian deployment
 
@@ -56,7 +50,8 @@ npm run dev
 Backend development harus berjalan di `http://127.0.0.1:8002`. Pada mode
 `development`, adapter memakai alamat itu jika konfigurasi belum diisi.
 Buka `http://localhost:3000/id` atau `http://localhost:3000/en`.
-Route `/id/upload` dan `/en/upload` tetap tersedia.
+Beranda tersedia di `/id` dan `/en`. Pemeriksaan ada di `/id/upload` dan
+`/en/upload`; panduan di `/id/guide` dan `/en/guide`.
 
 Untuk memakai backend lain, buat `.env.local` dari template ini lalu isi
 alamat backend yang sesungguhnya:
@@ -89,6 +84,10 @@ PDF. Hasil tanpa highlight tidak menjamin seluruh naskah sudah benar. PDF scan
 belum didukung OCR oleh backend.
 
 ## Deployment dan pengujian
+
+Tema terang/gelap tersedia melalui tombol matahari/bulan di toolbar, dengan
+pilihan tersimpan di browser. Target frontend `typotrace.jry.codes` dan
+persiapan SEO dijelaskan di [panduan tampilan dan domain](docs/DESIGN-SEO.md).
 
 - [Panduan merge dan Vercel](docs/VERCEL.md)
 - [Panduan tes integrasi dan contoh yang diharapkan](docs/TESTING.md)
