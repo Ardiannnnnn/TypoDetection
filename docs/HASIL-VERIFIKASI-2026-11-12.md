@@ -1,48 +1,40 @@
-# Hasil verifikasi lokal — 12 November 2026
+# Hasil verifikasi frontend
 
-Perubahan frontend diuji secara lokal sebelum diajukan melalui PR;
-belum dideploy. Upstream Ardiannnnnn/TypoDetection hanya
-memberi akun aktif akses pull, tanpa push/admin (GitHub API diperiksa).
+Diperbarui14November2026. Bukti12–13November berasal dari pengujian lokal
+sebelum PR; source aplikasi final telah dibangun ulang setelah menggabungkan
+main Ardian (31dd7f0). PR ini tidak melakukan merge atau deployment production.
 
-## Pemeriksaan yang lulus
+## Bukti yang tersedia
 
-- `npm run test:api`: 12 tes lulus.
-- `npm run typecheck`: lulus.
-- `npm run build`: lulus tanpa API dan dengan
-  `NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8002`.
-- Backend: 14 tes CORS lulus, satu warning deprecation TestClient/httpx.
-- Browser production localhost3000: tanpa konfigurasi, pesan layanan belum
-  terhubung terlihat dan tombol pilih PDF disabled.
-- Dengan backend v3 lokal: contoh diunggah langsung, completed100,
-  policy usk-2024-v3/resources evaluation-v3.0. Dua halaman,78 token sumber,
-  2 temuan ejaan,2 italic,18 tinjau. Counter token berbeda dari jumlah temuan.
-- Filter, pencarian, pemilihan temuan, refresh memulihkan hasil, /en/upload,
-  penolakan txt serta dialog/Escape diperiksa di browser.
-- PDF hasil HTTP200/7508byte; HTML HTTP200/318677byte; preview HTTP200.
-- Mobile390x844 tanpa overflow horizontal; console browser0error/0warning.
-- `git diff --check`: lulus.
+- Tes adapter API14November:12/12lulus. Meliputi konfigurasi base API,
+  FormData field file, validasi PDF/batas50MiB, kontrak progress/hasil,
+  filter/pagination/query, error, timeout dan pembatalan.
+- Build production setelah merge main:berhasil, termasuk validasi TypeScript.
+  Build pada snapshot commit terpisah menjaga server dev tetap berjalan.
+- Browser lokal:contoh→completed100 dengan policy usk-2024-v3 dan resources
+  evaluation-v3.0;2halaman/78token,2temuan ejaan/2italic/18tinjau.
+- Filter, pencarian, pilihan ringkasan yang membersihkan query, preview halaman,
+  refresh/session restore, /en/upload, penolakan txt dan dialog/Escape diperiksa.
+- PDF hasil dan HTML merespons200. Counter token dibedakan dari jumlah temuan.
+- Render desktop1440 dan mobile390 dilihat,320/390 tanpa overflow horizontal.
+  Tema terang/gelap, jeda/putar motion serta pergantian lembar diperiksa.
+- Metadata enam route bahasa (beranda/upload/guide), canonical/hreflang/lang,
+  sitemap6URL, robots serta share PNG diperiksa lewat HTTP production lokal.
+- Production tanpa API menampilkan layanan belum terhubung dan menonaktifkan
+  unggah; backend lama tidak menjadi fallback.
+- git diff --check lulus. Scan pola token/private-key pada diff tidak menemukan
+  kecocokan; tidak menyertakan .env.local atau dokumen pengguna.
 
-Node mengeluarkan warning module type dan experimental MockTimers saat tes.
-Tidak ada perubahan engine bahasa; hasil ini bukan ukuran akurasi bahasa baru.
-Belum menguji deployment publik, pemulihan jaringan putus, PDF besar,
-pagination banyak halaman atau seluruh kasus di TESTING.md.
+## Batas verifikasi
 
-Bukti lokal sementara: `/tmp/periksa-frontend-check.SsJ3wR`, termasuk screenshot
-desktop/mobile, snapshot browser, dan artefak backend sintetis. Server tes
-sudah dihentikan. Tidak memakai dokumen pengguna atau membaca file rahasia.
+Belum menguji deployment publik, pemulihan jaringan browser putus, PDF besar,
+pagination dengan banyak halaman, atau setting OS reduced-motion secara nyata.
+CSS reduced-motion disediakan. Tes teknis bukan ukuran akurasi bahasa baru.
 
-## Kelanjutan deployment
+Node mengeluarkan warning module type serta experimental MockTimers pada tes.
+Pengujian CORS backend sebelumnya:14lulus/1warning TestClient-httpx; source
+backend terpisah, bukan isi PR frontend. Dependency transitif tidak dikunci
+lintas repo backend; gunakan versi backend yang telah diverifikasi.
 
-Arahan setelah verifikasi: pengguna mengurus Dokploy dan merge frontend ke
-repo Ardian sendiri. Repo privat baru tidak diperlukan. Target backend dipilih
-`https://api-typotrace.jry.codes`; .env.example dan panduan sudah disesuaikan.
-DNS/HTTPS/deploy publik belum dilakukan. Isi base API sebelum build dan origin
-frontend pada CORS backend. Repo asal tetap read-only bagi akun agen.
-
-## Persiapan PR — 13 November 2026
-
-Tes adapter dijalankan kembali:12/12 lulus; pemeriksaan TypeScript dan
-`git diff --check` lulus. Build production serta bukti browser di atas tetap
-berlaku untuk kode aplikasi yang sama; perubahan setelahnya hanya dokumentasi.
-Frontend dan backend lokal dipulihkan setelah Orca restart; smoke HTTP backend
-13November kembali lulus. Deployment publik belum diuji.
+Base API production harus diisi sebelum build. DNS/Dokploy/Vercel production
+belum disiapkan melalui PR ini; lihat VERCEL.md.
