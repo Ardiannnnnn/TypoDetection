@@ -40,5 +40,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Nonsecret deployment template
+!.env.example
+
+# Local verification artifacts
+/test-results/
+/playwright-report/
+
+# Upstream development-only files
 /anti-slop
 DESIGN.md

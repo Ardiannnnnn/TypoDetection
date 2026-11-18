@@ -1,173 +1,106 @@
-# TypoDetector - AI-Powered Typo Detection System
+# TypoTrace — ruang tinjau laporan
 
-TypoDetector adalah aplikasi web modern yang menggunakan teknologi AI untuk mendeteksi kesalahan ejaan (typo) dan grammar dalam dokumen teks. Aplikasi ini dibangun menggunakan [Next.js](https://nextjs.org) dengan TypeScript dan Tailwind CSS.
+Frontend Next.js untuk mengunggah PDF, mengikuti pemeriksaan, dan meninjau
+kandidat salah tulis serta bagian asing yang belum italic. Pemeriksaan bahasa
+berjalan pada backend [Periksa Laporan](https://github.com/Papazy/periksaLaporan),
+bukan pada Vercel atau browser.
 
-## Fitur Utama
+Temuan adalah bantuan bagi penulis. Kata yang belum dikenal masuk tinjauan;
+itu bukan bukti bahwa kata tersebut salah. Aplikasi belum menjadi grammar
+checker umum, kamus lengkap, atau penilaian bahasa yang pasti. PDF hasil dan
+laporan disimpan oleh backend sesuai konfigurasi penyimpanannya.
 
-- 🤖 **AI-Powered Detection**: Menggunakan algoritma machine learning untuk deteksi typo yang akurat
-- ⚡ **Lightning Fast**: Proses dokumen dalam hitungan detik
-- 🔒 **Secure & Private**: Dokumen diproses secara aman dan tidak disimpan di server
-- 📱 **Responsive Design**: Interface yang responsif untuk semua perangkat
-- 🎨 **Modern UI**: Menggunakan font Poppins dan desain yang clean
+## Status pengembangan
 
-## Teknologi yang Digunakan
+Dikembangkan dari [Ardiannnnnn/TypoDetection](https://github.com/Ardiannnnnn/TypoDetection),
+karya [Ardian](https://github.com/Ardiannnnnn). Perubahan frontend diajukan melalui
+branch dan PR ke `main` di repository yang sama. Riwayat dan atribusi source
+asal dipertahankan. Source ini belum berarti situs Vercel sudah diperbarui;
+konfigurasi backend dan deployment tetap perlu disiapkan.
 
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **Font**: Poppins (offline)
-- **Icons**: Heroicons (SVG)
+## Pembagian deployment
 
-## Struktur Aplikasi
+| Bagian | Tempat | Sumber |
+| --- | --- | --- |
+| Frontend ini | Vercel | Repo Ardian setelah pengguna merge |
+| Backend pemeriksa | Application Dokploy baru | `Papazy/periksaLaporan`, branch `main` |
+| PDF/JSON/HTML hasil | Volume `/data` pada backend | Dibuat setelah pemrosesan selesai |
 
-- **Landing Page** (`/`): Halaman utama dengan informasi tentang aplikasi
-- **Upload Page** (`/upload`): Halaman untuk upload dan analisis dokumen
-- **About Page** (`/about`): Informasi detail tentang teknologi dan cara kerja
-- **404 Page**: Halaman error yang user-friendly
+Backend memakai satu worker dan satu replica. Status job masih berada di
+memori proses; restart/redeploy menghilangkan status job walaupun berkas pada
+volume dapat tetap tersedia. Pengguna perlu mengunggah ulang setelah sesi
+pemeriksaan tidak ditemukan.
 
-## Getting Started
+## Menjalankan lokal
 
-### Prerequisites
+Jika backend berada di folder saudara `../periksaLaporan`, setelah dependency
+kedua repo terpasang jalankan `../periksaLaporan/scripts/dev-local.sh`.
+Launcher menyalakan backend8002 dan frontend3000 dengan base API lokal,
+tanpa perlu menyalin template domain deployment ke .env.local.
+Lihat [panduan lokal backend](../periksaLaporan/docs/LOCAL.md).
 
-- Node.js 18+ 
-- npm, yarn, pnpm, atau bun
+Gunakan Node.js 22 dan npm. Lockfile yang dipakai untuk verifikasi adalah
+`package-lock.json`.
 
-### Installation
-
-1. Clone repository ini:
-```bash
-git clone https://github.com/Ardiannnnnn/TypoDetection.git
-cd typodeteksi
-```
-
-2. Install dependencies:
-```bash
-npm install
-# atau
-yarn install
-# atau
-pnpm install
-```
-
-3. Download font Poppins (opsional, sudah ada fallback):
-```bash
-# Jalankan script otomatis
-powershell -ExecutionPolicy Bypass -File download-fonts.ps1
-
-# Atau download manual dari https://fonts.google.com/specimen/Poppins
-# Letakkan file font di folder public/fonts/
-```
-
-4. Jalankan development server:
-
-```bash
+```sh
+npm ci
 npm run dev
-# atau
-yarn dev
-# atau
-pnpm dev
-# atau
-bun dev
 ```
 
-5. Buka [http://localhost:3000](http://localhost:3000) di browser untuk melihat aplikasi.
+Backend development harus berjalan di `http://127.0.0.1:8002`. Pada mode
+`development`, adapter memakai alamat itu jika konfigurasi belum diisi.
+Buka `http://localhost:3000/id` atau `http://localhost:3000/en`.
+Beranda tersedia di `/id` dan `/en`. Pemeriksaan ada di `/id/upload` dan
+`/en/upload`; panduan di `/id/guide` dan `/en/guide`.
 
-## Cara Menggunakan
+Untuk memakai backend lain, buat `.env.local` dari template ini lalu isi
+alamat backend yang sesungguhnya:
 
-1. **Landing Page**: Buka aplikasi dan lihat informasi tentang TypoDetector
-2. **Upload Document**: Klik "Get Started" atau "Upload Document"
-3. **Drag & Drop**: Seret file .txt ke area upload atau klik untuk browse
-4. **Detect Typos**: Klik tombol "Detect Typos" untuk memulai analisis
-5. **View Results**: Lihat hasil deteksi dengan statistik dan saran perbaikan
-
-## File Structure
-
-```
-typodeteksi/
-├── src/
-│   ├── app/                    # App Router pages
-│   │   ├── page.tsx           # Landing page
-│   │   ├── upload/page.tsx    # Upload page
-│   │   ├── about/page.tsx     # About page
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── globals.css        # Global styles
-│   │   └── fonts.css          # Font definitions
-│   └── components/            # Reusable components
-│       ├── Navbar.tsx
-│       └── LoadingSpinner.tsx
-├── public/
-│   ├── fonts/                 # Local fonts
-│   └── *.svg                  # Icons and images
-├── FONT_INSTRUCTIONS.md       # Font setup guide
-└── download-fonts.ps1         # Font download script
+```sh
+cp .env.example .env.local
 ```
 
-## Development
+```dotenv
+NEXT_PUBLIC_API_BASE_URL=https://api-typotrace.jry.codes
+```
 
-### Menambahkan Fitur Baru
+`api-typotrace.jry.codes` adalah target backend yang dipilih; Dokploy dan DNS
+akan diurus pengguna, belum deployment yang sudah tersedia. Jangan
+menggunakan alamat backend lama secara diam-diam. Nilai `NEXT_PUBLIC_` masuk
+bundle browser sehingga hanya boleh berisi konfigurasi publik, bukan API key
+atau kredensial.
 
-1. **Komponen Baru**: Buat di folder `src/components/`
-2. **Halaman Baru**: Buat di folder `src/app/`
-3. **Styling**: Gunakan Tailwind CSS classes
-4. **Font**: Semua komponen sudah menggunakan font Poppins
+## Alur pemeriksaan
 
-### Kustomisasi
+1. Pilih atau seret satu PDF dengan lapisan teks, maksimal 50 MiB.
+2. Mulai pemeriksaan atau gunakan dokumen contoh sintetis dari backend.
+3. Ikuti status `queued` → `processing` → `completed` atau `error`.
+4. Tinjau ringkasan, temuan ejaan, kekurangan italic, dan bagian yang belum jelas.
+5. Cari/filter temuan, buka halaman PDF, lalu unduh salinan hasil dan laporan.
+6. Perbaiki dokumen sumber sendiri. PDF input tidak ditimpa.
 
-- **Warna**: Edit variabel warna di `tailwind.config.ts`
-- **Font**: Ganti font di `src/app/fonts.css`
-- **Layout**: Modifikasi `src/app/layout.tsx`
+Hitungan temuan logis dapat berbeda dari jumlah token atau objek highlight
+PDF. Hasil tanpa highlight tidak menjamin seluruh naskah sudah benar. PDF scan
+belum didukung OCR oleh backend.
 
-This project uses Poppins font for better readability and modern design. The font is loaded locally for optimal performance.
+## Deployment dan pengujian
 
-## Learn More
+Tema terang/gelap tersedia melalui tombol matahari/bulan di toolbar, dengan
+pilihan tersimpan di browser. Target frontend `typotrace.jry.codes` dan
+persiapan SEO dijelaskan di [panduan tampilan dan domain](docs/DESIGN-SEO.md).
 
-Untuk mempelajari lebih lanjut tentang teknologi yang digunakan:
+- [Panduan merge dan Vercel](docs/VERCEL.md)
+- [Panduan tes integrasi dan contoh yang diharapkan](docs/TESTING.md)
+- [Panduan backend Dokploy](https://github.com/Papazy/periksaLaporan/blob/main/docs/DEPLOY-DOKPLOY.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - pelajari fitur dan API Next.js
-- [Tailwind CSS](https://tailwindcss.com/docs) - utility-first CSS framework
-- [TypeScript](https://www.typescriptlang.org/docs) - JavaScript with type safety
-- [React](https://react.dev) - library untuk membangun user interface
+Untuk memeriksa build production lokal setelah konfigurasi API diisi:
 
-## Contributing
+```sh
+npm run build
+npm start
+```
 
-1. Fork repository ini
-2. Buat branch untuk fitur baru (`git checkout -b feature/amazing-feature`)
-3. Commit perubahan (`git commit -m 'Add amazing feature'`)
-4. Push ke branch (`git push origin feature/amazing-feature`)
-5. Buat Pull Request
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-## Deploy on Vercel
-
-Cara termudah untuk deploy aplikasi TypoDetector:
-
-1. Push code ke GitHub repository
-2. Import project di [Vercel Platform](https://vercel.com/new)
-3. Configure build settings (otomatis untuk Next.js)
-4. Deploy!
-
-Aplikasi akan tersedia di URL yang diberikan Vercel.
-
-## Screenshots
-
-### Landing Page
-![Landing Page](docs/landing-page.png)
-
-### Upload Page
-![Upload Page](docs/upload-page.png)
-
-### Results Page
-![Results](docs/results-page.png)
-
-## Author
-
-**Ardian** - [@Ardiannnnnn](https://github.com/Ardiannnnnn)
-
-## Acknowledgments
-
-- Font Poppins dari Google Fonts
-- Icons dari Heroicons
-- Tailwind CSS untuk styling
-- Next.js team untuk framework yang luar biasa
+Keberhasilan build hanya membuktikan frontend dapat dibangun. Alur upload,
+CORS, versi engine, dan artefak harus diuji dengan backend nyata. Catat hasil
+pengujian yang benar-benar dijalankan; jangan memakai skor bahasa sebagai
+klaim akurasi seluruh dokumen.
