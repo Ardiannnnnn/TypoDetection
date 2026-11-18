@@ -46,6 +46,7 @@
   --focus: #81baff;
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--canvas); }
 button, input { font: inherit; }
 button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
@@ -253,8 +254,16 @@ dialog>.button { width: 100%; margin-top: 24px; }
 :root { --hero-stage: #e5eaff; --hero-decoration: #c5d2ff; --mint-stage: #e5f3ed; --coral-stage: #fff0e9; --process-surface: #eaf0ff; }
 :root[data-theme="dark"] { --hero-stage: #253659; --hero-decoration: #354f7c; --mint-stage: #1d3936; --coral-stage: #42302f; --process-surface: #1c2b46; }
 .site-navigation { display: flex; align-items: center; gap: 12px; }
-.site-navigation>a:not(.button) { color: var(--secondary); font-size: 14px; padding: 8px; }
+.site-navigation>a:not(.button) { position: relative; color: var(--secondary); font-size: 14px; padding: 8px; transition: color .2s ease, background-color .2s ease, transform .2s ease; }
+.site-navigation>a:not(.button):not(.locale-link):after { content: ""; position: absolute; right: 8px; bottom: 3px; left: 8px; height: 2px; border-radius: 2px; background: var(--action); transform: scaleX(0); transform-origin: center; transition: transform .2s ease; }
+.site-navigation>a:not(.button):hover { color: var(--ink); }
+.site-navigation>a:not(.button):not(.locale-link):hover:after, .site-navigation>a[aria-current="page"]:after { transform: scaleX(1); }
 .site-navigation>a[aria-current="page"] { color: var(--ink); }
+.site-toolbar .brand { transition: color .2s ease, transform .2s ease; }
+.site-toolbar .brand:hover { color: var(--action); transform: translateY(-1px); }
+.site-navigation>.button { transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.site-navigation>.button:hover { transform: translateY(-1px); box-shadow: 0 5px 12px #3159da26; }
+.site-navigation>.button:active, .site-toolbar .brand:active, .site-navigation>a:not(.button):active { transform: translateY(0) scale(.98); }
 .site-toolbar .brand svg { width: 35px; height: 35px; padding: 7px; background: #3159da; color: white; border-radius: 10px; }
 .landing { max-width: 1360px; padding: 0 48px 64px; margin: auto; }
 .landing-hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; padding: 68px 0 72px; }
