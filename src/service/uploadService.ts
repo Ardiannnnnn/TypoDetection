@@ -117,7 +117,7 @@ async function request<T>(path: string, options: {
       method: options.method ?? "GET",
       body: options.body,
       signal: controller.signal,
-      credentials: "omit",
+      credentials: "include",
       cache: "no-store",
     });
     if (!response.ok) {

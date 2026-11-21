@@ -60,7 +60,7 @@ test('upload is direct FormData with field file and lets browser set multipart b
   globalThis.fetch = async (url, options) => {
     assert.equal(url, 'https://api.example.test/upload');
     assert.equal(options.method, 'POST');
-    assert.equal(options.credentials, 'omit');
+    assert.equal(options.credentials, 'include');
     assert.equal(options.headers, undefined);
     assert.equal(options.body.get('file').name, 'laporan.PDF');
     return reply({ status: 'success', job_id: 'job', message: 'queued', original_filename: file.name });
@@ -174,7 +174,7 @@ test('public availability stays closed on private and legacy server responses', 
   for (const flag of [undefined, false, 'true', 1]) {
     globalThis.fetch = async (url, options) => {
       assert.equal(url, 'https://api.example.test/api/access');
-      assert.equal(options.credentials, 'omit');
+      assert.equal(options.credentials, 'include');
       assert.equal(options.cache, 'no-store');
       return reply({ mode: 'free', price_idr: 1000, payment_ready: false, public_upload_enabled: flag });
     };
