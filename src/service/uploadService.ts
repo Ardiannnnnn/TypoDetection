@@ -37,9 +37,9 @@ export const API_BASE_URL = normalizeBaseUrl(
   (process.env.NODE_ENV === "development" ? "http://127.0.0.1:8002" : ""),
 );
 export const isApiConfigured = API_BASE_URL.length > 0;
-export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 500 * 1024 * 1024;
 const REQUEST_TIMEOUT = 20_000;
-const UPLOAD_TIMEOUT = 90_000;
+const UPLOAD_TIMEOUT = 15 * 60_000;
 
 export type PublicAccess = {
   mode: "free" | "paid";
@@ -150,7 +150,7 @@ export function validatePdf(file: File): void {
     throw new ApiError("Pilih file PDF untuk diperiksa.", 0, "validation");
   }
   if (file.size === 0) throw new ApiError("File kosong. Pilih PDF yang memiliki isi.", 0, "validation");
-  if (file.size > MAX_UPLOAD_BYTES) throw new ApiError("File melebihi 50 MB.", 0, "validation");
+  if (file.size > MAX_UPLOAD_BYTES) throw new ApiError("File melebihi 500 MB.", 0, "validation");
 }
 
 export async function uploadFile(file: File, signal?: AbortSignal): Promise<UploadResponse> {
