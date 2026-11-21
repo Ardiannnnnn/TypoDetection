@@ -41,6 +41,26 @@ export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 const REQUEST_TIMEOUT = 20_000;
 const UPLOAD_TIMEOUT = 90_000;
 
+export type PublicAccess = {
+  mode: "free" | "paid";
+  price_idr: number;
+  payment_ready: boolean;
+  public_upload_enabled: boolean;
+};
+
+export function canUpload(access: PublicAccess | null): boolean {
+  return access?.public_upload_enabled === true && access.mode === "free";
+}
+
+export async function fetchAccess(signal?: AbortSignal): Promise<PublicAccess> {
+  const data: unknown = await request("/api/access", { signal });
+  if (!isRecord(data) || !["free", "paid"].includes(String(data.mode)) ||
+      !isCount(data.price_idr) || typeof data.payment_ready !== "boolean") return invalidResponse();
+  // Older servers do not advertise public permission: stay closed.
+  return { mode: data.mode as PublicAccess["mode"], price_idr: data.price_idr,
+    payment_ready: data.payment_ready, public_upload_enabled: data.public_upload_enabled === true };
+}
+
 export function apiUrl(path: string): string {
   if (!isApiConfigured) {
     throw new ApiError("Layanan pemeriksaan belum terhubung.", 0, "configuration");
