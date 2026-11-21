@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import AppearanceToggle from "./AppearanceToggle";
 import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Search, Upload, X } from "lucide-react";
-import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
+import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchPreview, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
 import type { PublicAccess, UploadProgress } from "@/service/uploadService";
 import type { CheckResult, FindingItem, FindingsResponse, ProgressResponse } from "@/types/upload";
 
@@ -44,6 +44,24 @@ export default function ReviewWorkspace() {
   const [listRetry, setListRetry] = useState(0);
   const [selected, setSelected] = useState("");
   const [pdfPage, setPdfPage] = useState(1);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewTransfer, setPreviewTransfer] = useState<UploadProgress | null>(null);
+  const [previewError, setPreviewError] = useState(false);
+  const [previewRetry, setPreviewRetry] = useState(0);
+  const previewJobId = job && result ? job.id : null;
+
+  useEffect(() => {
+    setPreviewUrl(null); setPreviewTransfer(null); setPreviewError(false);
+    if (!previewJobId) return;
+    const controller = new AbortController();
+    let objectUrl: string | null = null;
+    void fetchPreview(previewJobId, controller.signal, setPreviewTransfer).then(blob => {
+      if (controller.signal.aborted) return;
+      objectUrl = URL.createObjectURL(blob);
+      setPreviewUrl(objectUrl);
+    }).catch(() => { if (!controller.signal.aborted) setPreviewError(true); });
+    return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [previewJobId, previewRetry]);
   const fileInput = useRef<HTMLInputElement>(null);
   const guide = useRef<HTMLDialogElement>(null);
   const guideOpener = useRef<HTMLButtonElement | null>(null);
@@ -258,7 +276,7 @@ export default function ReviewWorkspace() {
   const elapsed = typeof progress?.elapsed_time === "number" ? Math.floor(progress.elapsed_time) : null;
   const elapsedLabel = elapsed === null ? null : `${Math.floor(elapsed / 60).toString().padStart(2, "0")}:${(elapsed % 60).toString().padStart(2, "0")}`;
 
-  const preview = job && result ? `${apiUrl(`/preview/${encodeURIComponent(job.id)}`)}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
+  const preview = previewUrl ? `${previewUrl}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
   const summary = result?.evaluation;
   const total = findings?.total || 0;
   const pages = Math.max(1, Math.ceil(total / pageSize));
@@ -331,7 +349,9 @@ export default function ReviewWorkspace() {
         <div className="review-workspace">
           <section ref={previewPane} className="preview-pane" aria-labelledby="previewHeading">
             <div className="pane-title"><h2 id="previewHeading">{say("Hasil Pemeriksaan", "Review Results")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div>
-            <div className="preview-canvas"><iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/></div>
+            <div className="preview-canvas">{preview ? <iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/> : <div className="processing-panel" role="status">
+              {previewError ? <><p>{say("Pratinjau belum dapat dimuat.", "The preview could not be loaded.")}</p><button className="button secondary" onClick={() => setPreviewRetry(value => value + 1)}>{say("Muat ulang pratinjau", "Retry preview")}</button></> : <><p>{say("Memuat PDF…", "Loading PDF…")}</p><progress max={previewTransfer?.total || undefined} value={previewTransfer?.total ? previewTransfer.loaded : undefined} aria-label={say("Unduhan pratinjau PDF", "PDF preview download")}/>{previewTransfer && <p><strong>{megabytes(previewTransfer.loaded)}{previewTransfer.total ? ` / ${megabytes(previewTransfer.total)}` : ""} MB</strong></p>}</>}
+            </div>}</div>
             <div className="pdf-pagination"><button className="icon-button" disabled={pdfPage <= 1} onClick={() => setPdfPage(p => Math.max(1, p - 1))} aria-label={say("Halaman PDF sebelumnya", "Previous PDF page")}><ChevronLeft/></button><span>{say("Halaman", "Page")} {pdfPage} / {result.total_pages}</span><button className="icon-button" disabled={pdfPage >= result.total_pages} onClick={() => setPdfPage(p => Math.min(result.total_pages, p + 1))} aria-label={say("Halaman PDF berikutnya", "Next PDF page")}><ChevronRight/></button></div>
           </section>
           <section className="findings-pane" aria-labelledby="findingsHeading">

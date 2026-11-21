@@ -272,3 +272,41 @@ test('upload transport cancellation, network failure and timeout stay distinct',
   t.mock.timers.tick(15 * 60_000 + 1);
   await assert.rejects(timeout, e => e.code === 'timeout' && e.status === 408);
 });
+
+
+test('preview fetch streams real download progress into a PDF blob using the session', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  const controller = new AbortController();
+  const pending = api.fetchPreview('job/id', controller.signal, value => events.push(value));
+  const xhr = UploadXHR.last;
+  assert.equal(xhr.method, 'GET');
+  assert.equal(xhr.url, 'https://api.example.test/preview/job%2Fid');
+  assert.equal(xhr.withCredentials, true);
+  assert.equal(xhr.responseType, 'blob');
+  xhr.onprogress({ loaded: 50, total: 100, lengthComputable: true });
+  assert.deepEqual(events, [{ loaded: 50, total: 100 }]);
+  xhr.response = new Blob(['%PDF-test'], { type: 'application/pdf' });
+  xhr.getResponseHeader = () => 'application/pdf';
+  xhr.onload();
+  const blob = await pending;
+  assert.equal(await blob.text(), '%PDF-test');
+  assert.equal(blob.type, 'application/pdf');
+  assert.equal(xhr.onprogress, null);
+});
+
+test('preview failures retain authorization status and reject non-PDF successful responses', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const pending = api.fetchPreview('job', new AbortController().signal, () => {});
+  UploadXHR.last.status = 401;
+  UploadXHR.last.response = new Blob([JSON.stringify({ detail: 'Sesi tidak tersedia' })], { type: 'application/json' });
+  UploadXHR.last.onload();
+  await assert.rejects(pending, e => e.status === 401);
+  const invalid = api.fetchPreview('job', new AbortController().signal, () => {});
+  UploadXHR.last.response = new Blob(['invalid'], { type: 'text/html' });
+  UploadXHR.last.getResponseHeader = () => 'text/html';
+  UploadXHR.last.onload();
+  await assert.rejects(invalid, e => e.code === 'response');
+});

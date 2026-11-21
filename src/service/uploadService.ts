@@ -97,24 +97,26 @@ function isCount(value: unknown): value is number {
 
 export type UploadProgress = { loaded: number; total: number | null };
 
-function uploadRequest(url: string, body: BodyInit | undefined, signal: AbortSignal,
-  onProgress: (progress: UploadProgress) => void): Promise<Response> {
+function progressRequest(url: string, body: BodyInit | undefined, signal: AbortSignal,
+  onProgress: (progress: UploadProgress) => void, download = false): Promise<Response> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) { reject(new DOMException("Request aborted", "AbortError")); return; }
     const xhr = new XMLHttpRequest();
-    const cleanup = () => { signal.removeEventListener("abort", abort); xhr.upload.onprogress = null; };
+    const cleanup = () => { signal.removeEventListener("abort", abort); xhr.upload.onprogress = null; xhr.onprogress = null; };
     const abort = () => xhr.abort();
-    xhr.upload.onprogress = event => onProgress({ loaded: event.loaded,
+    const report = (event: ProgressEvent) => onProgress({ loaded: event.loaded,
       total: event.lengthComputable && event.total > 0 ? event.total : null });
+    if (download) xhr.onprogress = report; else xhr.upload.onprogress = report;
     xhr.onload = () => {
       cleanup();
       if (!xhr.status) { reject(new TypeError("Upload network failure")); return; }
-      resolve(new Response(xhr.responseText, { status: xhr.status,
+      resolve(new Response(download ? xhr.response : xhr.responseText, { status: xhr.status,
         headers: { "Content-Type": xhr.getResponseHeader("Content-Type") || "application/json" } }));
     };
     xhr.onerror = () => { cleanup(); reject(new TypeError("Upload network failure")); };
     xhr.onabort = () => { cleanup(); reject(new DOMException("Request aborted", "AbortError")); };
-    xhr.open("POST", url);
+    xhr.open(download ? "GET" : "POST", url);
+    if (download) xhr.responseType = "blob";
     xhr.withCredentials = true;
     signal.addEventListener("abort", abort, { once: true });
     xhr.send(body as XMLHttpRequestBodyInit);
@@ -128,6 +130,7 @@ async function request<T>(path: string, options: {
   timeout?: number;
   blob?: boolean;
   onUploadProgress?: (progress: UploadProgress) => void;
+  onDownloadProgress?: (progress: UploadProgress) => void;
 } = {}): Promise<T> {
   const url = apiUrl(path);
   const controller = new AbortController();
@@ -141,7 +144,9 @@ async function request<T>(path: string, options: {
   }, options.timeout ?? REQUEST_TIMEOUT);
   try {
     const response = options.onUploadProgress
-      ? await uploadRequest(url, options.body, controller.signal, options.onUploadProgress)
+      ? await progressRequest(url, options.body, controller.signal, options.onUploadProgress)
+      : options.onDownloadProgress
+      ? await progressRequest(url, undefined, controller.signal, options.onDownloadProgress, true)
       : await fetch(url, {
       method: options.method ?? "GET",
       body: options.body,
@@ -254,4 +259,14 @@ export async function downloadResult(jobId: string, fileName = "hasil-pemeriksaa
   link.remove();
   // Let the browser start reading before releasing the object URL.
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+
+export async function fetchPreview(jobId: string, signal: AbortSignal,
+  onDownloadProgress: (progress: UploadProgress) => void): Promise<Blob> {
+  const blob = await request<Blob>(`/preview/${jobPath(jobId)}`, {
+    signal, blob: true, timeout: UPLOAD_TIMEOUT, onDownloadProgress,
+  });
+  if (!blob.size || blob.type !== "application/pdf") invalidResponse();
+  return blob;
 }
