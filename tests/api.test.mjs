@@ -200,3 +200,75 @@ test('500 MiB validation permits larger PDFs and rejects one byte above the limi
   Object.defineProperty(file, 'size', { value: 500 * 1024 * 1024 + 1 });
   assert.throws(() => api.validatePdf(file), e => e.code === 'validation' && e.message.includes('500 MB'));
 });
+
+
+const originalXHR = globalThis.XMLHttpRequest;
+afterEach(() => {
+  if (originalXHR === undefined) delete globalThis.XMLHttpRequest;
+  else globalThis.XMLHttpRequest = originalXHR;
+});
+
+class UploadXHR {
+  static last;
+  upload = {};
+  status = 200;
+  responseText = JSON.stringify({ status: 'success', job_id: 'real-job', original_filename: 'a.pdf', message: 'queued' });
+  constructor() { UploadXHR.last = this; }
+  open(method, url) { this.method = method; this.url = url; }
+  send(body) { this.body = body; }
+  getResponseHeader() { return 'application/json'; }
+  abort() { this.onabort(); }
+}
+
+test('upload progress comes from transport bytes; 100 percent still waits for server', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  let accepted = false;
+  const pending = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, value => events.push(value));
+  pending.then(() => { accepted = true; });
+  const xhr = UploadXHR.last;
+  assert.equal(xhr.method, 'POST');
+  assert.equal(xhr.url, 'https://api.example.test/upload');
+  assert.equal(xhr.withCredentials, true);
+  assert.equal(xhr.body.get('file').name, 'a.pdf');
+  assert.deepEqual(events, []);
+  xhr.upload.onprogress({ loaded: 25, total: 100, lengthComputable: true });
+  assert.deepEqual(events, [{ loaded: 25, total: 100 }]);
+  xhr.upload.onprogress({ loaded: 100, total: 100, lengthComputable: true });
+  await Promise.resolve();
+  assert.equal(accepted, false);
+  xhr.onload();
+  assert.equal((await pending).job_id, 'real-job');
+  assert.equal(xhr.upload.onprogress, null);
+});
+
+test('upload with unknown length does not invent a total, and retains HTTP error', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  const pending = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, value => events.push(value));
+  const xhr = UploadXHR.last;
+  xhr.upload.onprogress({ loaded: 33, total: 0, lengthComputable: false });
+  assert.deepEqual(events, [{ loaded: 33, total: null }]);
+  xhr.status = 401;
+  xhr.responseText = JSON.stringify({ detail: 'Sesi tidak tersedia' });
+  xhr.onload();
+  await assert.rejects(pending, e => e.status === 401 && e.message === 'Sesi tidak tersedia');
+});
+
+test('upload transport cancellation, network failure and timeout stay distinct', async t => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const controller = new AbortController();
+  const cancelled = api.uploadFile(new File(['pdf'], 'a.pdf'), controller.signal, () => {});
+  controller.abort();
+  await assert.rejects(cancelled, e => e.name === 'AbortError');
+  const failed = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, () => {});
+  UploadXHR.last.onerror();
+  await assert.rejects(failed, e => e.code === 'network');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const timeout = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, () => {});
+  t.mock.timers.tick(15 * 60_000 + 1);
+  await assert.rejects(timeout, e => e.code === 'timeout' && e.status === 408);
+});
