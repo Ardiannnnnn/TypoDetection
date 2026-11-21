@@ -292,7 +292,7 @@ export default function ReviewWorkspace() {
   return <>
     <a className="skip-link" href="#main">{say("Lewati navigasi", "Skip navigation")}</a>
     <header className="toolbar">
-      <a className="brand" href={`/${locale}`} aria-label="TypoTrace"><FileText aria-hidden="true"/><span>TypoTrace</span></a>
+      <a className="brand" href={`/${locale}`} aria-label="Check Your Paper"><FileText aria-hidden="true"/><span className="brand-wordmark"><strong>Check</strong><span>your paper</span></span></a>
       <div className="toolbar-actions">
         <AppearanceToggle english={english}/>
         <a className="locale-link" href={`/${english ? "id" : "en"}/upload`} aria-label={say("Switch to English", "Ganti ke Bahasa Indonesia")}>{english ? "ID" : "EN"}</a>
