@@ -1,8 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-/** Public deployment target. DNS/hosting are configured separately. */
-export const SITE_URL = "https://typotrace.jry.codes";
+const DEFAULT_SITE_URL = "https://checkyourpaper.jry.codes";
+
+function resolveSiteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return DEFAULT_SITE_URL;
+  try {
+    const parsed = new URL(raw);
+    return parsed.origin;
+  } catch {
+    return DEFAULT_SITE_URL;
+  }
+}
+
+/** Public deployment target. Reads NEXT_PUBLIC_SITE_URL with fallback. */
+export const SITE_URL = resolveSiteUrl();
 
 export const siteCopy = {
   id: {
@@ -29,9 +42,66 @@ export function buildSiteMetadata(locale: string, section = ""): Metadata {
     ...copy,
     applicationName: "TypoTrace",
     icons: { icon: "/favicon.svg" },
-    alternates: { canonical: `/${locale}${section}`, languages: { id: `/id${section}`, en: `/en${section}`, "x-default": `/id${section}` } },
+    alternates: { canonical: `/${locale}${section}`, languages: { id: `/id${section}`, en: `/en${section}`, "x-default": `/en${section}` } },
     robots: { index: indexable, follow: true },
     openGraph: { ...copy, url: `/${locale}${section}`, siteName: "TypoTrace", type: "website", locale: en ? "en_US" : "id_ID", alternateLocale: en ? "id_ID" : "en_US", images: [{ url: "/share-card.png", width: 1200, height: 630, alt: "TypoTrace — PDF review" }] },
     twitter: { card: "summary_large_image", ...copy, images: ["/share-card.png"] },
+  };
+}
+
+export function serializeJsonLd(data: Record<string, unknown>): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+export function buildWebApplicationJsonLd(locale: string): Record<string, unknown> {
+  const lang = locale === "id" ? "id" : "en";
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "TypoTrace",
+    url: `${SITE_URL}/${lang}`,
+    description: siteCopy[lang].description,
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Any",
+    inLanguage: ["en", "id"],
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+  };
+}
+
+export function buildBreadcrumbJsonLd(
+  locale: string,
+  items: ReadonlyArray<{ name: string; path: string }>,
+): Record<string, unknown> {
+  const lang = locale === "id" ? "id" : "en";
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}/${lang}${item.path}`,
+    })),
+  };
+}
+
+export function buildFaqJsonLd(
+  faqs: ReadonlyArray<readonly [string, string]>,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(([question, answer]) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answer,
+      },
+    })),
   };
 }

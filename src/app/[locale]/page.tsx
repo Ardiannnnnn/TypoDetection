@@ -2,12 +2,14 @@ import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 import SiteHeader from "@/components/review/SiteHeader";
 import DocumentMotion from "@/components/review/DocumentMotion";
+import { buildWebApplicationJsonLd, serializeJsonLd } from "@/lib/site";
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const en = locale === "en";
   const say = (id: string, english: string) => en ? english : id;
   return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildWebApplicationJsonLd(locale)) }} />
     <SiteHeader locale={locale} />
     <main className="landing">
       <section className="landing-hero">
