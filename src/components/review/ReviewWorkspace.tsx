@@ -186,7 +186,7 @@ export default function ReviewWorkspace() {
     const problem = !value.name.toLowerCase().endsWith(".pdf")
       ? say("Pilih file PDF untuk diperiksa.", "Choose a PDF file to review.")
       : value.size === 0 ? say("File kosong. Pilih PDF yang memiliki isi.", "This file is empty. Choose another PDF.")
-      : value.size > 50 * 1024 * 1024 ? say("File melebihi 50 MB.", "The file exceeds 50 MB.") : "";
+      : value.size > 500 * 1024 * 1024 ? say("File melebihi 500 MB.", "The file exceeds 500 MB.") : "";
     setFileError(problem); setFile(problem ? null : value);
     return !problem;
   }
@@ -284,7 +284,7 @@ export default function ReviewWorkspace() {
             onDrop={event => { event.preventDefault(); setDragging(false); const files = event.dataTransfer.files; if (files.length > 1) setFileError(say("Pilih satu PDF untuk setiap pemeriksaan.", "Choose one PDF per review.")); else if (files[0] && isApiConfigured) selectFile(files[0]); }}>
             <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!uploadEnabled || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={event => { if (event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
             {file ? <div className="file-selection"><FileText className="document-icon" aria-hidden="true"/><h2>{file.name}</h2><p>{number(Math.max(1, Math.round(file.size / 1024)))} KB</p><button className="text-button" disabled={busy} onClick={() => fileInput.current?.click()}>{say("Ganti PDF", "Choose another PDF")}</button></div>
-              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!uploadEnabled || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 50 MB", "Text-based PDF · Up to 50 MB")}</p></div>}
+              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!uploadEnabled || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 500 MB", "Text-based PDF · Up to 500 MB")}</p></div>}
           </div>
           {fileError && <p className="inline-error" role="alert">{fileError}</p>}
           {file && <button className="button primary start-button" disabled={busy || !uploadEnabled} onClick={() => startUpload(file)}>{say("Periksa PDF", "Review PDF")}<ArrowRight/></button>}

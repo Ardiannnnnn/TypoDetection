@@ -187,3 +187,16 @@ test('public availability stays closed on private and legacy server responses', 
   globalThis.fetch = async () => reply({ mode: 'free', price_idr: '1000', payment_ready: false });
   await assert.rejects(api.fetchAccess(), e => e.code === 'response');
 });
+
+
+test('500 MiB validation permits larger PDFs and rejects one byte above the limit', async () => {
+  const api = await service();
+  for (const bytes of [60 * 1024 * 1024, 500 * 1024 * 1024]) {
+    const file = new File(['pdf'], 'large.pdf');
+    Object.defineProperty(file, 'size', { value: bytes });
+    assert.doesNotThrow(() => api.validatePdf(file));
+  }
+  const file = new File(['pdf'], 'too-large.pdf');
+  Object.defineProperty(file, 'size', { value: 500 * 1024 * 1024 + 1 });
+  assert.throws(() => api.validatePdf(file), e => e.code === 'validation' && e.message.includes('500 MB'));
+});

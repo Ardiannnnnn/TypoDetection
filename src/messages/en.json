@@ -129,7 +129,7 @@
         },
         "fileFormats": {
           "question": "What file formats are supported?",
-          "answer": "Currently supports PDF format with maximum size of 50MB."
+          "answer": "Currently supports PDF format with maximum size of 500MB."
         }
       }
     },

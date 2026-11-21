@@ -129,7 +129,7 @@
         },
         "fileFormats": {
           "question": "Format file apa yang didukung?",
-          "answer": "Saat ini mendukung format PDF dengan ukuran maksimal 50MB."
+          "answer": "Saat ini mendukung format PDF dengan ukuran maksimal 500MB."
         }
       }
     },
@@ -171,7 +171,7 @@
       "title": "Unggah Dokumen PDF",
       "dragDrop": "Seret & lepas file PDF Anda di sini",
       "or": "atau klik untuk mencari file",
-      "support": "Mendukung: File PDF hingga 50MB",
+      "support": "Mendukung: File PDF hingga 500MB",
       "ready": "PDF Siap untuk Dianalisis",
       "size": "Ukuran"
     },
