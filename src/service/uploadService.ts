@@ -95,12 +95,39 @@ function isCount(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
+export type UploadProgress = { loaded: number; total: number | null };
+
+function uploadRequest(url: string, body: BodyInit | undefined, signal: AbortSignal,
+  onProgress: (progress: UploadProgress) => void): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) { reject(new DOMException("Request aborted", "AbortError")); return; }
+    const xhr = new XMLHttpRequest();
+    const cleanup = () => { signal.removeEventListener("abort", abort); xhr.upload.onprogress = null; };
+    const abort = () => xhr.abort();
+    xhr.upload.onprogress = event => onProgress({ loaded: event.loaded,
+      total: event.lengthComputable && event.total > 0 ? event.total : null });
+    xhr.onload = () => {
+      cleanup();
+      if (!xhr.status) { reject(new TypeError("Upload network failure")); return; }
+      resolve(new Response(xhr.responseText, { status: xhr.status,
+        headers: { "Content-Type": xhr.getResponseHeader("Content-Type") || "application/json" } }));
+    };
+    xhr.onerror = () => { cleanup(); reject(new TypeError("Upload network failure")); };
+    xhr.onabort = () => { cleanup(); reject(new DOMException("Request aborted", "AbortError")); };
+    xhr.open("POST", url);
+    xhr.withCredentials = true;
+    signal.addEventListener("abort", abort, { once: true });
+    xhr.send(body as XMLHttpRequestBodyInit);
+  });
+}
+
 async function request<T>(path: string, options: {
   method?: "GET" | "POST";
   body?: BodyInit;
   signal?: AbortSignal;
   timeout?: number;
   blob?: boolean;
+  onUploadProgress?: (progress: UploadProgress) => void;
 } = {}): Promise<T> {
   const url = apiUrl(path);
   const controller = new AbortController();
@@ -113,7 +140,9 @@ async function request<T>(path: string, options: {
     controller.abort();
   }, options.timeout ?? REQUEST_TIMEOUT);
   try {
-    const response = await fetch(url, {
+    const response = options.onUploadProgress
+      ? await uploadRequest(url, options.body, controller.signal, options.onUploadProgress)
+      : await fetch(url, {
       method: options.method ?? "GET",
       body: options.body,
       signal: controller.signal,
@@ -153,11 +182,11 @@ export function validatePdf(file: File): void {
   if (file.size > MAX_UPLOAD_BYTES) throw new ApiError("File melebihi 500 MB.", 0, "validation");
 }
 
-export async function uploadFile(file: File, signal?: AbortSignal): Promise<UploadResponse> {
+export async function uploadFile(file: File, signal?: AbortSignal, onUploadProgress?: (progress: UploadProgress) => void): Promise<UploadResponse> {
   validatePdf(file);
   const formData = new FormData();
   formData.append("file", file);
-  const data: unknown = await request("/upload", { method: "POST", body: formData, signal, timeout: UPLOAD_TIMEOUT });
+  const data: unknown = await request("/upload", { method: "POST", body: formData, signal, timeout: UPLOAD_TIMEOUT, onUploadProgress });
   if (!isRecord(data) || typeof data.job_id !== "string" || !data.job_id ||
       typeof data.original_filename !== "string" || typeof data.message !== "string") return invalidResponse();
   if (data.status !== "success") throw new ApiError(data.message, 200, "api_error");

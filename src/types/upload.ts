@@ -37,6 +37,8 @@ export type ProgressResponse = {
   status: "queued" | "processing" | "completed" | "error";
   progress: number;
   current_page?: number;
+  queue_position?: number | null;
+  elapsed_time?: number | null;
   total_pages?: number;
   message?: string;
   error?: string;

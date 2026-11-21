@@ -5,7 +5,7 @@ import { useLocale } from "next-intl";
 import AppearanceToggle from "./AppearanceToggle";
 import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Search, Upload, X } from "lucide-react";
 import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
-import type { PublicAccess } from "@/service/uploadService";
+import type { PublicAccess, UploadProgress } from "@/service/uploadService";
 import type { CheckResult, FindingItem, FindingsResponse, ProgressResponse } from "@/types/upload";
 
 type SavedJob = { id: string; name: string };
@@ -25,6 +25,7 @@ export default function ReviewWorkspace() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
   const [busy, setBusy] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [dragging, setDragging] = useState(false);
   const [fileError, setFileError] = useState("");
   const [connectionNote, setConnectionNote] = useState("");
@@ -127,8 +128,9 @@ export default function ReviewWorkspace() {
         timer = setTimeout(poll, 900);
       } catch (error) {
         if (disposed || (error instanceof Error && error.name === "AbortError")) return;
-        if (error instanceof ApiError && error.status === 404) {
-          setFailure({ title: say("Sesi pemeriksaan tidak tersedia.", "This review session is unavailable."), message: say("Server mungkin sudah dimulai ulang. Unggah kembali PDF untuk memulai pemeriksaan baru.", "The server may have restarted. Upload your PDF again to start a new review."), retry: false });
+        if (error instanceof ApiError && [401, 404].includes(error.status)) {
+          remember(null);
+          setFailure({ title: say("Sesi pemeriksaan tidak tersedia.", "This review session is unavailable."), message: say("Sesi tidak tersedia di browser ini atau server sudah dimulai ulang. Pilih PDF baru untuk memulai lagi.", "The session is unavailable in this browser or the server restarted. Choose a new PDF to start again."), retry: false });
           setPanel("error");
         } else if (++attempts < 3) {
           setConnectionNote(say("Koneksi terputus. Memeriksa status kembali…", "Connection interrupted. Checking the status again…"));
@@ -175,6 +177,7 @@ export default function ReviewWorkspace() {
     operation.current += 1;
     uploadController.current?.abort();
     remember(null);
+    setUploadProgress(null);
     setJob(null); setResult(null); setFile(null); setProgress(null); setBusy(false);
     setFailure(null); setFileError(""); setConnectionNote(""); setKind(""); setQuery("");
     setSearch(""); setPage(1); setPdfPage(1); setFindings(null); setSelected(""); setPanel("welcome");
@@ -198,9 +201,12 @@ export default function ReviewWorkspace() {
     uploadController.current = controller;
     const current = ++operation.current;
     remember(null); setJob(null); setResult(null); setProgress(null); setFailure(null);
+    setUploadProgress(null);
     setConnectionNote(""); setBusy(true); setPanel("processing");
     try {
-      const uploaded = await uploadFile(value, controller.signal);
+      const uploaded = await uploadFile(value, controller.signal, data => {
+        if (current === operation.current) setUploadProgress(data);
+      });
       if (current !== operation.current) return;
       const saved = { id: uploaded.job_id, name: uploaded.original_filename || value.name };
       remember(saved); setJob(saved);
@@ -244,6 +250,13 @@ export default function ReviewWorkspace() {
       findingsTitle.current?.focus({ preventScroll: true });
     }
   }
+
+  const uploadPercent = uploadProgress?.total ? Math.min(100, Math.floor(uploadProgress.loaded / uploadProgress.total * 100)) : undefined;
+  const queued = progress?.status === "queued";
+  const displayedPercent = job ? progress?.progress : uploadPercent;
+  const megabytes = (bytes: number) => new Intl.NumberFormat(english ? "en-US" : "id-ID", { maximumFractionDigits: 2 }).format(bytes / 1024 / 1024);
+  const elapsed = typeof progress?.elapsed_time === "number" ? Math.floor(progress.elapsed_time) : null;
+  const elapsedLabel = elapsed === null ? null : `${Math.floor(elapsed / 60).toString().padStart(2, "0")}:${(elapsed % 60).toString().padStart(2, "0")}`;
 
   const preview = job && result ? `${apiUrl(`/preview/${encodeURIComponent(job.id)}`)}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
   const summary = result?.evaluation;
@@ -295,10 +308,16 @@ export default function ReviewWorkspace() {
 
       {panel === "processing" && <section className="processing-panel" aria-labelledby="processingTitle">
         <span className="spinner" aria-hidden="true"/>
-        <h1 id="processingTitle">{job ? say("Memeriksa PDF…", "Reviewing your PDF…") : say("Mengunggah PDF…", "Uploading your PDF…")}</h1>
+        <h1 id="processingTitle">{job
+          ? queued ? say("Menunggu antrean…", "Waiting in queue…") : say("Memeriksa PDF…", "Reviewing your PDF…")
+          : uploadPercent === 100 ? say("Menunggu server…", "Waiting for the server…") : say("Mengunggah PDF…", "Uploading your PDF…")}</h1>
         <p className="processing-filename">{filename}</p>
-        <div className="progress-wrap"><progress max={100} value={job ? Math.min(100, Math.max(0, progress?.progress || 0)) : undefined} aria-label={say("Progres pemeriksaan", "Review progress")}/><span>{job ? `${Math.round(progress?.progress || 0)}%` : ""}</span></div>
-        <p id="processingMessage" role="status" aria-live="polite">{connectionNote || progress?.message || say("Menyiapkan halaman…", "Preparing pages…")}</p>
+        <div className="progress-wrap"><progress max={100} value={displayedPercent} aria-label={job ? say("Progres pemeriksaan", "Review progress") : say("Progres unggahan", "Upload progress")}/><span>{displayedPercent === undefined ? "—" : `${Math.round(displayedPercent)}%`}</span></div>
+        {!job && uploadProgress && <p className="processing-filename">{say("Terkirim", "Sent")} <strong>{megabytes(uploadProgress.loaded)}{uploadProgress.total ? ` / ${megabytes(uploadProgress.total)}` : ""} MB</strong></p>}
+        {job && queued && progress.queue_position && <p className="processing-filename">{say("Posisi antrean", "Queue position")} <strong>{number(progress.queue_position)}</strong></p>}
+        {job && !queued && (progress?.total_pages || 0) > 0 && <p className="processing-filename">{say("Halaman", "Page")} <strong>{number(progress?.current_page || 0)} / {number(progress?.total_pages || 0)}</strong></p>}
+        {job && elapsedLabel && <p className="processing-filename">{say("Waktu pemeriksaan", "Processing time")} <strong>{elapsedLabel}</strong></p>}
+        <p id="processingMessage" role="status" aria-live="polite">{connectionNote || (job ? progress?.message || say("Mengambil status server…", "Fetching server status…") : uploadPercent === 100 ? say("Data terkirim. Menunggu konfirmasi server; PDF belum selesai diperiksa.", "Data sent. Waiting for server confirmation; the PDF has not finished processing.") : say("Mengirim data dari browser ke server.", "Sending data from your browser to the server."))}</p>
       </section>}
 
       {panel === "error" && failure && <section className="error-panel"><span className="error-symbol" aria-hidden="true">!</span><h1 ref={errorTitle} tabIndex={-1}>{failure.title}</h1><p role="alert">{failure.message}</p><div className="error-actions">{failure.retry && <button className="button primary" onClick={() => { setConnectionNote(""); setRetry(v => v + 1); setPanel("processing"); }}>{say("Cek status lagi", "Check status again")}</button>}<button className="button secondary" onClick={reset}>{say("Pilih PDF lain", "Choose another PDF")}</button></div></section>}
