@@ -363,8 +363,9 @@ dialog>.button { width: 100%; margin-top: 24px; }
 .actual-product .section-heading h2 { white-space: pre-line; font-size: 38px; }
 .actual-product .section-heading p { max-width: 360px; font-size: 17px; line-height: 1.65; }
 .actual-product .section-heading { align-items: center; margin-bottom: 30px; }
-.product-capture { display: block; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); box-shadow: 0 12px 38px #1929530b; }
-.product-capture img { display: block; width: 100%; height: auto; }
+.product-capture { position: relative; aspect-ratio: 1360 / 762; display: block; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--surface); box-shadow: 0 12px 38px #1929530b; }
+/* Show the PDF/findings region (x40,y338) of the 1440x1100 source capture. */
+.product-capture img { position: absolute; display: block; width: 105.882353%; max-width: none; height: auto; left: -2.941176%; top: -44.356955%; }
 .product-benefits { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 40px; padding-top: 25px; font-size: 15px; }
 .product-benefits span { display: inline-flex; align-items: center; gap: 9px; }
 .product-benefits svg { width: 18px; height: 18px; color: var(--success); }
