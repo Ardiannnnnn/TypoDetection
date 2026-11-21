@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import AppearanceToggle from "./AppearanceToggle";
 import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Search, Upload, X } from "lucide-react";
-import { API_BASE_URL, ApiError, apiUrl, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
+import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
+import type { PublicAccess } from "@/service/uploadService";
 import type { CheckResult, FindingItem, FindingsResponse, ProgressResponse } from "@/types/upload";
 
 type SavedJob = { id: string; name: string };
@@ -27,6 +28,9 @@ export default function ReviewWorkspace() {
   const [dragging, setDragging] = useState(false);
   const [fileError, setFileError] = useState("");
   const [connectionNote, setConnectionNote] = useState("");
+  const [access, setAccess] = useState<PublicAccess | null>(null);
+  const [accessState, setAccessState] = useState<"loading" | "ready" | "unavailable">("loading");
+  const uploadEnabled = canUpload(access);
   const [failure, setFailure] = useState<Failure | null>(null);
   const [retry, setRetry] = useState(0);
   const [kind, setKind] = useState("");
@@ -58,6 +62,22 @@ export default function ReviewWorkspace() {
 
   useEffect(() => {
     if (!isApiConfigured) return;
+    const controller = new AbortController();
+    async function refresh() {
+      try {
+        const value = await fetchAccess(controller.signal);
+        setAccess(value); setAccessState("ready");
+      } catch {
+        if (!controller.signal.aborted) { setAccess(null); setAccessState("unavailable"); }
+      }
+    }
+    void refresh();
+    window.addEventListener("focus", refresh);
+    return () => { controller.abort(); window.removeEventListener("focus", refresh); };
+  }, []);
+
+  useEffect(() => {
+    if (!isApiConfigured || !uploadEnabled) return;
     try {
       const value = JSON.parse(sessionStorage.getItem(storageKey) || "null");
       if (value && typeof value.id === "string" && value.id && typeof value.name === "string") {
@@ -66,7 +86,7 @@ export default function ReviewWorkspace() {
       }
     } catch { /* Ignore unavailable or invalid session storage. */ }
     return () => { operation.current += 1; uploadController.current?.abort(); };
-  }, [storageKey]);
+  }, [storageKey, uploadEnabled]);
 
   useEffect(() => {
     const preventFileNavigation = (event: DragEvent) => {
@@ -162,6 +182,7 @@ export default function ReviewWorkspace() {
   }
 
   function selectFile(value: File) {
+    if (!uploadEnabled) return false;
     const problem = !value.name.toLowerCase().endsWith(".pdf")
       ? say("Pilih file PDF untuk diperiksa.", "Choose a PDF file to review.")
       : value.size === 0 ? say("File kosong. Pilih PDF yang memiliki isi.", "This file is empty. Choose another PDF.")
@@ -171,7 +192,7 @@ export default function ReviewWorkspace() {
   }
 
   async function startUpload(value: File) {
-    if (!isApiConfigured || !selectFile(value)) return;
+    if (!uploadEnabled || !isApiConfigured || !selectFile(value)) return;
     uploadController.current?.abort();
     const controller = new AbortController();
     uploadController.current = controller;
@@ -191,7 +212,7 @@ export default function ReviewWorkspace() {
   }
 
   async function tryExample() {
-    if (busy || !isApiConfigured) return;
+    if (busy || !uploadEnabled || !isApiConfigured) return;
     uploadController.current?.abort();
     const controller = new AbortController(); uploadController.current = controller;
     const current = ++operation.current; setBusy(true); setFileError("");
@@ -252,18 +273,24 @@ export default function ReviewWorkspace() {
       {panel === "welcome" && <section className="welcome">
         <div className="intro"><h1>{say("Periksa laporan Anda.", "Review your report.")}</h1><p>{say("Temukan dugaan salah ejaan dan istilah yang belum miring.", "Find possible spelling issues and terms that need italics.")}</p></div>
         {!isApiConfigured && <p className="service-notice" role="status">{say("Layanan pemeriksaan belum terhubung.", "The review service is not connected yet.")}</p>}
+        {isApiConfigured && !uploadEnabled && <p className="service-notice" role="status">{accessState === "loading"
+          ? say("Memeriksa ketersediaan layanan…", "Checking service availability…")
+          : accessState === "unavailable"
+          ? say("Layanan belum dapat dihubungi. Unggahan sementara dinonaktifkan.", "The service is unavailable. Uploads are temporarily disabled.")
+          : say("Pemeriksaan belum dibuka untuk publik. Tidak ada berkas yang diunggah.", "Public reviews are not available yet. No files are uploaded.")}</p>}
         <div className="upload-panel">
           <div className={`dropzone${dragging ? " dragging" : ""}`} role="group" aria-label={say("Unggah dokumen PDF", "Upload a PDF")}
             onDragOver={event => { event.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)}
             onDrop={event => { event.preventDefault(); setDragging(false); const files = event.dataTransfer.files; if (files.length > 1) setFileError(say("Pilih satu PDF untuk setiap pemeriksaan.", "Choose one PDF per review.")); else if (files[0] && isApiConfigured) selectFile(files[0]); }}>
-            <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!isApiConfigured || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={event => { if (event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
+            <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!uploadEnabled || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={event => { if (event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
             {file ? <div className="file-selection"><FileText className="document-icon" aria-hidden="true"/><h2>{file.name}</h2><p>{number(Math.max(1, Math.round(file.size / 1024)))} KB</p><button className="text-button" disabled={busy} onClick={() => fileInput.current?.click()}>{say("Ganti PDF", "Choose another PDF")}</button></div>
-              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!isApiConfigured || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 50 MB", "Text-based PDF · Up to 50 MB")}</p></div>}
+              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!uploadEnabled || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 50 MB", "Text-based PDF · Up to 50 MB")}</p></div>}
           </div>
           {fileError && <p className="inline-error" role="alert">{fileError}</p>}
-          {file && <button className="button primary start-button" disabled={busy || !isApiConfigured} onClick={() => startUpload(file)}>{say("Periksa PDF", "Review PDF")}<ArrowRight/></button>}
+          {file && <button className="button primary start-button" disabled={busy || !uploadEnabled} onClick={() => startUpload(file)}>{say("Periksa PDF", "Review PDF")}<ArrowRight/></button>}
         </div>
-        <button className="example-button" disabled={busy || !isApiConfigured} onClick={tryExample}>{busy ? say("Menyiapkan contoh…", "Preparing sample…") : say("Coba dengan PDF contoh", "Try a sample PDF")}</button>
+        {uploadEnabled ? <button className="example-button" disabled={busy} onClick={tryExample}>{busy ? say("Menyiapkan contoh…", "Preparing sample…") : say("Coba dengan PDF contoh", "Try a sample PDF")}</button>
+          : <a className="example-button" href={`/${locale}#example`}>{say("Lihat contoh hasil", "View sample results")}</a>}
       </section>}
 
       {panel === "processing" && <section className="processing-panel" aria-labelledby="processingTitle">

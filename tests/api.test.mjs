@@ -167,3 +167,23 @@ test('example is fetched from backend and returned as a PDF File', async () => {
   assert.equal(file.name, 'contoh-laporan.pdf');
   assert.equal(file.type, 'application/pdf');
 });
+
+test('public availability stays closed on private and legacy server responses', async () => {
+  const api = await service();
+  assert.equal(api.canUpload(null), false);
+  for (const flag of [undefined, false, 'true', 1]) {
+    globalThis.fetch = async (url, options) => {
+      assert.equal(url, 'https://api.example.test/api/access');
+      assert.equal(options.credentials, 'omit');
+      assert.equal(options.cache, 'no-store');
+      return reply({ mode: 'free', price_idr: 1000, payment_ready: false, public_upload_enabled: flag });
+    };
+    assert.equal(api.canUpload(await api.fetchAccess()), false);
+  }
+  globalThis.fetch = async () => reply({ mode: 'paid', price_idr: 1000, payment_ready: false, public_upload_enabled: true });
+  assert.equal(api.canUpload(await api.fetchAccess()), false);
+  globalThis.fetch = async () => reply({ mode: 'free', price_idr: 1000, payment_ready: false, public_upload_enabled: true });
+  assert.equal(api.canUpload(await api.fetchAccess()), true);
+  globalThis.fetch = async () => reply({ mode: 'free', price_idr: '1000', payment_ready: false });
+  await assert.rejects(api.fetchAccess(), e => e.code === 'response');
+});
