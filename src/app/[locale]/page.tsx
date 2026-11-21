@@ -12,7 +12,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <main className="landing">
       <section className="landing-hero">
         <div className="hero-copy">
-          <h1>{say("Laporan selesai.", "Report finished.")}<br/><span>{say("Saatnya diperiksa.", "Time for a review.")}</span></h1>
+          <h1>{say("Laporan ", "Report ")}<span>{say("selesai", "finished")}</span>.<br/>{say("Saatnya ", "Time for a ")}<span>{say("diperiksa.", "review.")}</span></h1>
           <p>{say("Bantu temukan ejaan yang terlewat dan istilah yang belum miring. Tinjau langsung di PDF laporan Anda.", "Find possible spelling issues and terms that need italics. Review them directly in your Indonesian PDF report.")}</p>
           <div className="hero-actions"><a className="button primary hero-action" href={`/${locale}/upload`}>{say("Periksa laporan saya", "Review my report")}<ArrowRight aria-hidden="true"/></a><a className="hero-example-link" href="#example">{say("Lihat hasilnya", "See the results")}</a></div>
         </div>
