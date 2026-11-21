@@ -284,7 +284,7 @@ export default function ReviewWorkspace() {
         {!!result.coverage?.unreadable_pages && <p className="coverage-note">{number(result.coverage.unreadable_pages)} {say("halaman tidak memiliki teks yang dapat dibaca dan belum diperiksa.", "pages have no readable text and could not be reviewed.")}</p>}
         <div className="review-workspace">
           <section ref={previewPane} className="preview-pane" aria-labelledby="previewHeading">
-            <div className="pane-title"><h2 id="previewHeading">{say("PDF hasil", "Reviewed PDF")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div>
+            <div className="pane-title"><h2 id="previewHeading">{say("Hasil Pemeriksaan", "Review Results")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div>
             <div className="preview-canvas"><iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/></div>
             <div className="pdf-pagination"><button className="icon-button" disabled={pdfPage <= 1} onClick={() => setPdfPage(p => Math.max(1, p - 1))} aria-label={say("Halaman PDF sebelumnya", "Previous PDF page")}><ChevronLeft/></button><span>{say("Halaman", "Page")} {pdfPage} / {result.total_pages}</span><button className="icon-button" disabled={pdfPage >= result.total_pages} onClick={() => setPdfPage(p => Math.min(result.total_pages, p + 1))} aria-label={say("Halaman PDF berikutnya", "Next PDF page")}><ChevronRight/></button></div>
           </section>
