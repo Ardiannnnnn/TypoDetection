@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import AppearanceToggle from "./AppearanceToggle";
 import { ArrowDownToLine, ArrowRight, Check, ChevronLeft, ChevronRight, CircleHelp, ExternalLink, FileText, Search, Upload, X } from "lucide-react";
-import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
-import type { PublicAccess } from "@/service/uploadService";
+import { API_BASE_URL, ApiError, apiUrl, canUpload, fetchAccess, fetchExample, fetchFindings, fetchPreview, fetchProgress, isApiConfigured, uploadFile } from "@/service/uploadService";
+import type { PublicAccess, UploadProgress } from "@/service/uploadService";
 import type { CheckResult, FindingItem, FindingsResponse, ProgressResponse } from "@/types/upload";
 
 type SavedJob = { id: string; name: string };
@@ -25,6 +25,7 @@ export default function ReviewWorkspace() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [progress, setProgress] = useState<ProgressResponse | null>(null);
   const [busy, setBusy] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
   const [dragging, setDragging] = useState(false);
   const [fileError, setFileError] = useState("");
   const [connectionNote, setConnectionNote] = useState("");
@@ -43,6 +44,24 @@ export default function ReviewWorkspace() {
   const [listRetry, setListRetry] = useState(0);
   const [selected, setSelected] = useState("");
   const [pdfPage, setPdfPage] = useState(1);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewTransfer, setPreviewTransfer] = useState<UploadProgress | null>(null);
+  const [previewError, setPreviewError] = useState(false);
+  const [previewRetry, setPreviewRetry] = useState(0);
+  const previewJobId = job && result ? job.id : null;
+
+  useEffect(() => {
+    setPreviewUrl(null); setPreviewTransfer(null); setPreviewError(false);
+    if (!previewJobId) return;
+    const controller = new AbortController();
+    let objectUrl: string | null = null;
+    void fetchPreview(previewJobId, controller.signal, setPreviewTransfer).then(blob => {
+      if (controller.signal.aborted) return;
+      objectUrl = URL.createObjectURL(blob);
+      setPreviewUrl(objectUrl);
+    }).catch(() => { if (!controller.signal.aborted) setPreviewError(true); });
+    return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [previewJobId, previewRetry]);
   const fileInput = useRef<HTMLInputElement>(null);
   const guide = useRef<HTMLDialogElement>(null);
   const guideOpener = useRef<HTMLButtonElement | null>(null);
@@ -127,8 +146,9 @@ export default function ReviewWorkspace() {
         timer = setTimeout(poll, 900);
       } catch (error) {
         if (disposed || (error instanceof Error && error.name === "AbortError")) return;
-        if (error instanceof ApiError && error.status === 404) {
-          setFailure({ title: say("Sesi pemeriksaan tidak tersedia.", "This review session is unavailable."), message: say("Server mungkin sudah dimulai ulang. Unggah kembali PDF untuk memulai pemeriksaan baru.", "The server may have restarted. Upload your PDF again to start a new review."), retry: false });
+        if (error instanceof ApiError && [401, 404].includes(error.status)) {
+          remember(null);
+          setFailure({ title: say("Sesi pemeriksaan tidak tersedia.", "This review session is unavailable."), message: say("Sesi tidak tersedia di browser ini atau server sudah dimulai ulang. Pilih PDF baru untuk memulai lagi.", "The session is unavailable in this browser or the server restarted. Choose a new PDF to start again."), retry: false });
           setPanel("error");
         } else if (++attempts < 3) {
           setConnectionNote(say("Koneksi terputus. Memeriksa status kembali…", "Connection interrupted. Checking the status again…"));
@@ -175,6 +195,7 @@ export default function ReviewWorkspace() {
     operation.current += 1;
     uploadController.current?.abort();
     remember(null);
+    setUploadProgress(null);
     setJob(null); setResult(null); setFile(null); setProgress(null); setBusy(false);
     setFailure(null); setFileError(""); setConnectionNote(""); setKind(""); setQuery("");
     setSearch(""); setPage(1); setPdfPage(1); setFindings(null); setSelected(""); setPanel("welcome");
@@ -186,7 +207,7 @@ export default function ReviewWorkspace() {
     const problem = !value.name.toLowerCase().endsWith(".pdf")
       ? say("Pilih file PDF untuk diperiksa.", "Choose a PDF file to review.")
       : value.size === 0 ? say("File kosong. Pilih PDF yang memiliki isi.", "This file is empty. Choose another PDF.")
-      : value.size > 50 * 1024 * 1024 ? say("File melebihi 50 MB.", "The file exceeds 50 MB.") : "";
+      : value.size > 500 * 1024 * 1024 ? say("File melebihi 500 MB.", "The file exceeds 500 MB.") : "";
     setFileError(problem); setFile(problem ? null : value);
     return !problem;
   }
@@ -198,9 +219,12 @@ export default function ReviewWorkspace() {
     uploadController.current = controller;
     const current = ++operation.current;
     remember(null); setJob(null); setResult(null); setProgress(null); setFailure(null);
+    setUploadProgress(null);
     setConnectionNote(""); setBusy(true); setPanel("processing");
     try {
-      const uploaded = await uploadFile(value, controller.signal);
+      const uploaded = await uploadFile(value, controller.signal, data => {
+        if (current === operation.current) setUploadProgress(data);
+      });
       if (current !== operation.current) return;
       const saved = { id: uploaded.job_id, name: uploaded.original_filename || value.name };
       remember(saved); setJob(saved);
@@ -245,7 +269,14 @@ export default function ReviewWorkspace() {
     }
   }
 
-  const preview = job && result ? `${apiUrl(`/preview/${encodeURIComponent(job.id)}`)}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
+  const uploadPercent = uploadProgress?.total ? Math.min(100, Math.floor(uploadProgress.loaded / uploadProgress.total * 100)) : undefined;
+  const queued = progress?.status === "queued";
+  const displayedPercent = job ? progress?.progress : uploadPercent;
+  const megabytes = (bytes: number) => new Intl.NumberFormat(english ? "en-US" : "id-ID", { maximumFractionDigits: 2 }).format(bytes / 1024 / 1024);
+  const elapsed = typeof progress?.elapsed_time === "number" ? Math.floor(progress.elapsed_time) : null;
+  const elapsedLabel = elapsed === null ? null : `${Math.floor(elapsed / 60).toString().padStart(2, "0")}:${(elapsed % 60).toString().padStart(2, "0")}`;
+
+  const preview = previewUrl ? `${previewUrl}#page=${pdfPage}&view=FitH&navpanes=0` : undefined;
   const summary = result?.evaluation;
   const total = findings?.total || 0;
   const pages = Math.max(1, Math.ceil(total / pageSize));
@@ -261,7 +292,7 @@ export default function ReviewWorkspace() {
   return <>
     <a className="skip-link" href="#main">{say("Lewati navigasi", "Skip navigation")}</a>
     <header className="toolbar">
-      <a className="brand" href={`/${locale}`} aria-label="TypoTrace"><FileText aria-hidden="true"/><span>TypoTrace</span></a>
+      <a className="brand" href={`/${locale}`} aria-label="Check Your Paper"><FileText aria-hidden="true"/><span className="brand-wordmark"><strong>Check</strong><span>your paper</span></span></a>
       <div className="toolbar-actions">
         <AppearanceToggle english={english}/>
         <a className="locale-link" href={`/${english ? "id" : "en"}/upload`} aria-label={say("Switch to English", "Ganti ke Bahasa Indonesia")}>{english ? "ID" : "EN"}</a>
@@ -284,7 +315,7 @@ export default function ReviewWorkspace() {
             onDrop={event => { event.preventDefault(); setDragging(false); const files = event.dataTransfer.files; if (files.length > 1) setFileError(say("Pilih satu PDF untuk setiap pemeriksaan.", "Choose one PDF per review.")); else if (files[0] && isApiConfigured) selectFile(files[0]); }}>
             <input ref={fileInput} id="fileInput" className="visually-hidden" tabIndex={-1} type="file" accept=".pdf,application/pdf" disabled={!uploadEnabled || busy} aria-label={say("Pilih dokumen PDF", "Choose a PDF file")} onChange={event => { if (event.target.files?.[0]) selectFile(event.target.files[0]); }}/>
             {file ? <div className="file-selection"><FileText className="document-icon" aria-hidden="true"/><h2>{file.name}</h2><p>{number(Math.max(1, Math.round(file.size / 1024)))} KB</p><button className="text-button" disabled={busy} onClick={() => fileInput.current?.click()}>{say("Ganti PDF", "Choose another PDF")}</button></div>
-              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!uploadEnabled || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 50 MB", "Text-based PDF · Up to 50 MB")}</p></div>}
+              : <div className="drop-prompt"><Upload className="upload-icon" aria-hidden="true"/><h2>{say("Taruh PDF di sini", "Drop your PDF here")}</h2><button className="button primary" disabled={!uploadEnabled || busy} onClick={() => fileInput.current?.click()}>{say("Pilih PDF", "Choose PDF")}<ArrowRight/></button><p className="file-hint">{say("PDF dengan teks · Maks. 500 MB", "Text-based PDF · Up to 500 MB")}</p></div>}
           </div>
           {fileError && <p className="inline-error" role="alert">{fileError}</p>}
           {file && <button className="button primary start-button" disabled={busy || !uploadEnabled} onClick={() => startUpload(file)}>{say("Periksa PDF", "Review PDF")}<ArrowRight/></button>}
@@ -295,10 +326,16 @@ export default function ReviewWorkspace() {
 
       {panel === "processing" && <section className="processing-panel" aria-labelledby="processingTitle">
         <span className="spinner" aria-hidden="true"/>
-        <h1 id="processingTitle">{job ? say("Memeriksa PDF…", "Reviewing your PDF…") : say("Mengunggah PDF…", "Uploading your PDF…")}</h1>
+        <h1 id="processingTitle">{job
+          ? queued ? say("Menunggu antrean…", "Waiting in queue…") : say("Memeriksa PDF…", "Reviewing your PDF…")
+          : uploadPercent === 100 ? say("Menunggu server…", "Waiting for the server…") : say("Mengunggah PDF…", "Uploading your PDF…")}</h1>
         <p className="processing-filename">{filename}</p>
-        <div className="progress-wrap"><progress max={100} value={job ? Math.min(100, Math.max(0, progress?.progress || 0)) : undefined} aria-label={say("Progres pemeriksaan", "Review progress")}/><span>{job ? `${Math.round(progress?.progress || 0)}%` : ""}</span></div>
-        <p id="processingMessage" role="status" aria-live="polite">{connectionNote || progress?.message || say("Menyiapkan halaman…", "Preparing pages…")}</p>
+        <div className="progress-wrap"><progress max={100} value={displayedPercent} aria-label={job ? say("Progres pemeriksaan", "Review progress") : say("Progres unggahan", "Upload progress")}/><span>{displayedPercent === undefined ? "—" : `${Math.round(displayedPercent)}%`}</span></div>
+        {!job && uploadProgress && <p className="processing-filename">{say("Terkirim", "Sent")} <strong>{megabytes(uploadProgress.loaded)}{uploadProgress.total ? ` / ${megabytes(uploadProgress.total)}` : ""} MB</strong></p>}
+        {job && queued && progress.queue_position && <p className="processing-filename">{say("Posisi antrean", "Queue position")} <strong>{number(progress.queue_position)}</strong></p>}
+        {job && !queued && (progress?.total_pages || 0) > 0 && <p className="processing-filename">{say("Halaman", "Page")} <strong>{number(progress?.current_page || 0)} / {number(progress?.total_pages || 0)}</strong></p>}
+        {job && elapsedLabel && <p className="processing-filename">{say("Waktu pemeriksaan", "Processing time")} <strong>{elapsedLabel}</strong></p>}
+        <p id="processingMessage" role="status" aria-live="polite">{connectionNote || (job ? progress?.message || say("Mengambil status server…", "Fetching server status…") : uploadPercent === 100 ? say("Data terkirim. Menunggu konfirmasi server; PDF belum selesai diperiksa.", "Data sent. Waiting for server confirmation; the PDF has not finished processing.") : say("Mengirim data dari browser ke server.", "Sending data from your browser to the server."))}</p>
       </section>}
 
       {panel === "error" && failure && <section className="error-panel"><span className="error-symbol" aria-hidden="true">!</span><h1 ref={errorTitle} tabIndex={-1}>{failure.title}</h1><p role="alert">{failure.message}</p><div className="error-actions">{failure.retry && <button className="button primary" onClick={() => { setConnectionNote(""); setRetry(v => v + 1); setPanel("processing"); }}>{say("Cek status lagi", "Check status again")}</button>}<button className="button secondary" onClick={reset}>{say("Pilih PDF lain", "Choose another PDF")}</button></div></section>}
@@ -312,7 +349,9 @@ export default function ReviewWorkspace() {
         <div className="review-workspace">
           <section ref={previewPane} className="preview-pane" aria-labelledby="previewHeading">
             <div className="pane-title"><h2 id="previewHeading">{say("Hasil Pemeriksaan", "Review Results")}</h2><a className="text-button" href={preview} target="_blank" rel="noopener">{say("Buka PDF", "Open PDF")}<ExternalLink/></a></div>
-            <div className="preview-canvas"><iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/></div>
+            <div className="preview-canvas">{preview ? <iframe key={`${job.id}-${pdfPage}`} src={preview} title={say("Pratinjau PDF hasil pemeriksaan", "Reviewed PDF preview")}/> : <div className="processing-panel" role="status">
+              {previewError ? <><p>{say("Pratinjau belum dapat dimuat.", "The preview could not be loaded.")}</p><button className="button secondary" onClick={() => setPreviewRetry(value => value + 1)}>{say("Muat ulang pratinjau", "Retry preview")}</button></> : <><p>{say("Memuat PDF…", "Loading PDF…")}</p><progress max={previewTransfer?.total || undefined} value={previewTransfer?.total ? previewTransfer.loaded : undefined} aria-label={say("Unduhan pratinjau PDF", "PDF preview download")}/>{previewTransfer && <p><strong>{megabytes(previewTransfer.loaded)}{previewTransfer.total ? ` / ${megabytes(previewTransfer.total)}` : ""} MB</strong></p>}</>}
+            </div>}</div>
             <div className="pdf-pagination"><button className="icon-button" disabled={pdfPage <= 1} onClick={() => setPdfPage(p => Math.max(1, p - 1))} aria-label={say("Halaman PDF sebelumnya", "Previous PDF page")}><ChevronLeft/></button><span>{say("Halaman", "Page")} {pdfPage} / {result.total_pages}</span><button className="icon-button" disabled={pdfPage >= result.total_pages} onClick={() => setPdfPage(p => Math.min(result.total_pages, p + 1))} aria-label={say("Halaman PDF berikutnya", "Next PDF page")}><ChevronRight/></button></div>
           </section>
           <section className="findings-pane" aria-labelledby="findingsHeading">

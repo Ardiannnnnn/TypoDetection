@@ -144,12 +144,12 @@ export default function Navbar({ showBackButton = false }: NavbarProps) {
             >
               <span className="hidden sm:inline">
                 {renderTextWithHighlight(
-                  "##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##"
+                  "##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END##"
                 )}
               </span>
               <span className="sm:hidden">
                 {renderTextWithHighlight(
-                  "##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##"
+                  "##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END##"
                 )}
               </span>
             </span>

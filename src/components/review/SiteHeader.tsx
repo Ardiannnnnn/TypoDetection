@@ -7,7 +7,7 @@ import AppearanceToggle from "./AppearanceToggle";
 export default function SiteHeader({ locale, section = "" }: { locale: string; section?: string }) {
   const english = locale === "en";
   return <header className="toolbar site-toolbar" data-section={section}>
-    <Link className="brand" href={`/${locale}`} aria-label="TypoTrace" aria-current={section === "" ? "page" : undefined}><FileText aria-hidden="true"/><span>TypoTrace</span></Link>
+    <Link className="brand" href={`/${locale}`} aria-label="Check Your Paper" aria-current={section === "" ? "page" : undefined}><FileText aria-hidden="true"/><span className="brand-wordmark"><strong>Check</strong><span>your paper</span></span></Link>
     <nav className="site-navigation" aria-label={english ? "Main navigation" : "Navigasi utama"}>
       <Link href={`/${locale}/guide`} aria-current={section === "/guide" ? "page" : undefined}>{english ? "Guide" : "Panduan"}</Link>
       <AppearanceToggle english={english}/>

@@ -60,7 +60,7 @@ test('upload is direct FormData with field file and lets browser set multipart b
   globalThis.fetch = async (url, options) => {
     assert.equal(url, 'https://api.example.test/upload');
     assert.equal(options.method, 'POST');
-    assert.equal(options.credentials, 'omit');
+    assert.equal(options.credentials, 'include');
     assert.equal(options.headers, undefined);
     assert.equal(options.body.get('file').name, 'laporan.PDF');
     return reply({ status: 'success', job_id: 'job', message: 'queued', original_filename: file.name });
@@ -174,7 +174,7 @@ test('public availability stays closed on private and legacy server responses', 
   for (const flag of [undefined, false, 'true', 1]) {
     globalThis.fetch = async (url, options) => {
       assert.equal(url, 'https://api.example.test/api/access');
-      assert.equal(options.credentials, 'omit');
+      assert.equal(options.credentials, 'include');
       assert.equal(options.cache, 'no-store');
       return reply({ mode: 'free', price_idr: 1000, payment_ready: false, public_upload_enabled: flag });
     };
@@ -186,4 +186,127 @@ test('public availability stays closed on private and legacy server responses', 
   assert.equal(api.canUpload(await api.fetchAccess()), true);
   globalThis.fetch = async () => reply({ mode: 'free', price_idr: '1000', payment_ready: false });
   await assert.rejects(api.fetchAccess(), e => e.code === 'response');
+});
+
+
+test('500 MiB validation permits larger PDFs and rejects one byte above the limit', async () => {
+  const api = await service();
+  for (const bytes of [60 * 1024 * 1024, 500 * 1024 * 1024]) {
+    const file = new File(['pdf'], 'large.pdf');
+    Object.defineProperty(file, 'size', { value: bytes });
+    assert.doesNotThrow(() => api.validatePdf(file));
+  }
+  const file = new File(['pdf'], 'too-large.pdf');
+  Object.defineProperty(file, 'size', { value: 500 * 1024 * 1024 + 1 });
+  assert.throws(() => api.validatePdf(file), e => e.code === 'validation' && e.message.includes('500 MB'));
+});
+
+
+const originalXHR = globalThis.XMLHttpRequest;
+afterEach(() => {
+  if (originalXHR === undefined) delete globalThis.XMLHttpRequest;
+  else globalThis.XMLHttpRequest = originalXHR;
+});
+
+class UploadXHR {
+  static last;
+  upload = {};
+  status = 200;
+  responseText = JSON.stringify({ status: 'success', job_id: 'real-job', original_filename: 'a.pdf', message: 'queued' });
+  constructor() { UploadXHR.last = this; }
+  open(method, url) { this.method = method; this.url = url; }
+  send(body) { this.body = body; }
+  getResponseHeader() { return 'application/json'; }
+  abort() { this.onabort(); }
+}
+
+test('upload progress comes from transport bytes; 100 percent still waits for server', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  let accepted = false;
+  const pending = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, value => events.push(value));
+  pending.then(() => { accepted = true; });
+  const xhr = UploadXHR.last;
+  assert.equal(xhr.method, 'POST');
+  assert.equal(xhr.url, 'https://api.example.test/upload');
+  assert.equal(xhr.withCredentials, true);
+  assert.equal(xhr.body.get('file').name, 'a.pdf');
+  assert.deepEqual(events, []);
+  xhr.upload.onprogress({ loaded: 25, total: 100, lengthComputable: true });
+  assert.deepEqual(events, [{ loaded: 25, total: 100 }]);
+  xhr.upload.onprogress({ loaded: 100, total: 100, lengthComputable: true });
+  await Promise.resolve();
+  assert.equal(accepted, false);
+  xhr.onload();
+  assert.equal((await pending).job_id, 'real-job');
+  assert.equal(xhr.upload.onprogress, null);
+});
+
+test('upload with unknown length does not invent a total, and retains HTTP error', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  const pending = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, value => events.push(value));
+  const xhr = UploadXHR.last;
+  xhr.upload.onprogress({ loaded: 33, total: 0, lengthComputable: false });
+  assert.deepEqual(events, [{ loaded: 33, total: null }]);
+  xhr.status = 401;
+  xhr.responseText = JSON.stringify({ detail: 'Sesi tidak tersedia' });
+  xhr.onload();
+  await assert.rejects(pending, e => e.status === 401 && e.message === 'Sesi tidak tersedia');
+});
+
+test('upload transport cancellation, network failure and timeout stay distinct', async t => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const controller = new AbortController();
+  const cancelled = api.uploadFile(new File(['pdf'], 'a.pdf'), controller.signal, () => {});
+  controller.abort();
+  await assert.rejects(cancelled, e => e.name === 'AbortError');
+  const failed = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, () => {});
+  UploadXHR.last.onerror();
+  await assert.rejects(failed, e => e.code === 'network');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const timeout = api.uploadFile(new File(['pdf'], 'a.pdf'), undefined, () => {});
+  t.mock.timers.tick(15 * 60_000 + 1);
+  await assert.rejects(timeout, e => e.code === 'timeout' && e.status === 408);
+});
+
+
+test('preview fetch streams real download progress into a PDF blob using the session', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const events = [];
+  const controller = new AbortController();
+  const pending = api.fetchPreview('job/id', controller.signal, value => events.push(value));
+  const xhr = UploadXHR.last;
+  assert.equal(xhr.method, 'GET');
+  assert.equal(xhr.url, 'https://api.example.test/preview/job%2Fid');
+  assert.equal(xhr.withCredentials, true);
+  assert.equal(xhr.responseType, 'blob');
+  xhr.onprogress({ loaded: 50, total: 100, lengthComputable: true });
+  assert.deepEqual(events, [{ loaded: 50, total: 100 }]);
+  xhr.response = new Blob(['%PDF-test'], { type: 'application/pdf' });
+  xhr.getResponseHeader = () => 'application/pdf';
+  xhr.onload();
+  const blob = await pending;
+  assert.equal(await blob.text(), '%PDF-test');
+  assert.equal(blob.type, 'application/pdf');
+  assert.equal(xhr.onprogress, null);
+});
+
+test('preview failures retain authorization status and reject non-PDF successful responses', async () => {
+  const api = await service();
+  globalThis.XMLHttpRequest = UploadXHR;
+  const pending = api.fetchPreview('job', new AbortController().signal, () => {});
+  UploadXHR.last.status = 401;
+  UploadXHR.last.response = new Blob([JSON.stringify({ detail: 'Sesi tidak tersedia' })], { type: 'application/json' });
+  UploadXHR.last.onload();
+  await assert.rejects(pending, e => e.status === 401);
+  const invalid = api.fetchPreview('job', new AbortController().signal, () => {});
+  UploadXHR.last.response = new Blob(['invalid'], { type: 'text/html' });
+  UploadXHR.last.getResponseHeader = () => 'text/html';
+  UploadXHR.last.onload();
+  await assert.rejects(invalid, e => e.code === 'response');
 });
