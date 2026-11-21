@@ -10,7 +10,7 @@
   },
   "hero": {
     "title": "Periksa ##HIGHLIGHT_START##Typo##HIGHLIGHT_END## Dokumen##BR##Sebelum Dikumpulkan",
-    "subtitle": "Unggah laporan tugas akhir atau skripsi dalam format PDF. TypoTrace menandai kesalahan ejaan dan pengetikan secara langsung beserta saran perbaikannya.",
+    "subtitle": "Unggah laporan tugas akhir atau skripsi dalam format PDF. Check Your Paper menandai kesalahan ejaan dan pengetikan secara langsung beserta saran perbaikannya.",
     "uploadDocument": "Unggah Dokumen PDF",
     "learnMore": "Lihat Cara Kerja",
     "supportedFormat": "Mendukung dokumen PDF hingga halaman laporan lengkap",
@@ -47,9 +47,9 @@
     "users": "Pengguna Puas"
   },
   "about": {
-    "title": "Tentang ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
-    "subtitle": "TypoTrace adalah website yang dirancang untuk membantu anda mendeteksi dan memperbaiki kesalahan pengetikan dalam laporan tugas akhir atau skripsi anda, kami mengharapkan aplikasi ini dapat meningkatkan kualitas tulisan Anda.",
-    "whyChoose": "Mengapa Kami Membuat TypoTrace?",
+    "title": "Tentang ##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END##",
+    "subtitle": "Check Your Paper adalah website yang dirancang untuk membantu anda mendeteksi dan memperbaiki kesalahan pengetikan dalam laporan tugas akhir atau skripsi anda, kami mengharapkan aplikasi ini dapat meningkatkan kualitas tulisan Anda.",
+    "whyChoose": "Mengapa Kami Membuat Check Your Paper?",
     "features": {
       "aiTechnology": {
         "title": "Proofreading Manual Memakan Waktu",
@@ -67,13 +67,13 @@
     "mission": {
       "title": "Misi Kami",
       "description": "Kami berkomitmen untuk membantu meningkatkan kualitas tulisan dan komunikasi dengan menyediakan teknologi deteksi typo yang akurat, cepat, dan mudah digunakan untuk semua orang.",
-      "team": "Tim TypoTrace",
+      "team": "Tim Check Your Paper",
       "role": "Penelitian & Pengembangan AI",
       "quote": "Membuat teknologi AI yang dapat membantu semua orang menulis dengan lebih baik dan percaya diri."
     }
   },
   "howItWorks": {
-    "title": "Cara Kerja ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
+    "title": "Cara Kerja ##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END##",
     "subtitle": "Proses deteksi typo yang mudah dan cepat dalam 4 langkah sederhana",
     "steps": {
       "upload": {
@@ -220,8 +220,8 @@
     }
   },
   "footer": {
-    "powered": "Didukung oleh AI TypoTrace.",
-    "copyright": "© TypoTrace. Semua hak cipta dilindungi.",
+    "powered": "Didukung oleh AI Check Your Paper.",
+    "copyright": "© Check Your Paper. Semua hak cipta dilindungi.",
     "allRightsReserved": "Seluruh hak cipta dilindungi."
   }
 }

@@ -21,7 +21,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div>
             <h3 className="text-xl font-bold text-indigo-400 mb-3 font-poppins">
-              TypoTrace
+              Check Your Paper
             </h3>
             <p className="text-slate-300 text-sm font-poppins leading-relaxed">
               {t("footer.powered")}

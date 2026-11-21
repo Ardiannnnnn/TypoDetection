@@ -10,7 +10,7 @@
   },
   "hero": {
     "title": "Catch Document ##HIGHLIGHT_START##Typos##HIGHLIGHT_END####BR##Before Submission",
-    "subtitle": "Upload your thesis or final report in PDF format. TypoTrace highlights spelling mistakes and typing errors directly in context with clear fix suggestions.",
+    "subtitle": "Upload your thesis or final report in PDF format. Check Your Paper highlights spelling mistakes and typing errors directly in context with clear fix suggestions.",
     "uploadDocument": "Upload PDF Document",
     "learnMore": "See How It Works",
     "supportedFormat": "Supports multi-page PDF reports and academic papers",
@@ -47,9 +47,9 @@
     "users": "Happy Users"
   },
   "about": {
-    "title": "About ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END##",
-    "subtitle": "TypoTrace is an advanced AI application designed to help you detect and correct typos in your final project reports or theses, aiming to enhance the quality of your writing.",
-    "whyChoose": "Why We Created TypoTrace?",
+    "title": "About ##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END##",
+    "subtitle": "Check Your Paper is an advanced AI application designed to help you detect and correct typos in your final project reports or theses, aiming to enhance the quality of your writing.",
+    "whyChoose": "Why We Created Check Your Paper?",
     "features": {
       "aiTechnology": {
         "title": "Manual Proofreading is Time-Consuming",
@@ -67,13 +67,13 @@
     "mission": {
       "title": "Our Mission",
       "description": "We are committed to helping improve writing quality and communication by providing accurate, fast, and easy-to-use typo detection technology for everyone.",
-      "team": "TypoTrace Team",
+      "team": "Check Your Paper Team",
       "role": "AI Research & Development",
       "quote": "Creating AI technology that can help everyone write better and more confidently."
     }
   },
   "howItWorks": {
-    "title": "How ##HIGHLIGHT_START##TypoTrace##HIGHLIGHT_END## Works",
+    "title": "How ##HIGHLIGHT_START##Check Your Paper##HIGHLIGHT_END## Works",
     "subtitle": "Easy and fast typo detection process in 4 simple steps",
     "steps": {
       "upload": {
@@ -217,7 +217,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2025 TypoTrace. All rights reserved.",
+    "copyright": "© 2025 Check Your Paper. All rights reserved.",
     "powered": "Powered by Advanced AI Technology for Accurate Typo Detection"
   }
 }

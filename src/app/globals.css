@@ -438,3 +438,9 @@ dialog>.button { width: 100%; margin-top: 24px; }
   .motion-loupe { transform: rotate(-8deg); }
   .motion-toggle { display: none; }
 }
+
+
+/* Check Your Paper wordmark: owner's two-line hierarchy. */
+.brand-wordmark { display: grid; gap: 1px; text-align: left; }
+.brand-wordmark strong { font-size: 29px; font-weight: 750; line-height: 1; letter-spacing: -1px; }
+.brand-wordmark > span { font-size: 11px; font-weight: 500; line-height: 1.2; letter-spacing: .35px; }
